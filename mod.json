@@ -1,0 +1,21 @@
+{
+	"geode": "2.0.0-beta.23",
+	"gd": "2.204",
+	"version": "v0.0.0",
+	"id": "rooot.betterprofiles",
+	"name": "BetterProfiles",
+	"developer": "rooot",
+	"description": "",
+	"dependencies": [
+		{
+			"id": "rooot.dashauth",
+			"version": "0.0.1",
+			"importance": "required"
+		},
+		{
+			"id": "geode.node-ids",
+			"version": "1.8.1",
+			"importance": "required"
+		}
+	]
+}
