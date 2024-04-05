@@ -52,7 +52,7 @@ class $modify(BetterProfilePage, ProfilePage) {
                 if (m_fields->m_profile_data.pronouns.has_value()) {
                     log::debug("settings pronoun label");
                     log::debug("pronouns: {}", m_fields->m_profile_data.pronouns.value());
-                    
+
                     m_fields->m_pronoun_label->setString(m_fields->m_profile_data.pronouns.value().c_str());
                     m_fields->m_pronoun_label->setVisible(true);
                 }
@@ -65,23 +65,26 @@ class $modify(BetterProfilePage, ProfilePage) {
         log::debug("loadPageFromUserInfo");
         ProfilePage::loadPageFromUserInfo(score);
 
-        // add edit button
-        auto edit_button = CCMenuItemSpriteExtra::create(
-			CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png"),
-			this,
-			nullptr
-		);
-        edit_button->setID("edit-button"_spr);
+        if (score->isCurrentUser()) {
+            // add edit button
+            auto edit_button = CCMenuItemSpriteExtra::create(
+                CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png"),
+                this,
+                nullptr
+            );
+            edit_button->setID("edit-button"_spr);
+            
+            auto left_menu = this->getChildByIDRecursive("left-menu");
+            if (left_menu == nullptr) {
+                log::error("left_menu is null");
+                return;
+            }
 
-        auto left_menu = this->getChildByIDRecursive("left-menu");
-        if (left_menu == nullptr) {
-            log::error("left_menu is null");
-            return;
-        }
-
-        if (!left_menu->getChildByID("edit-button"_spr)) {
-            left_menu->addChild(edit_button);
-            left_menu->updateLayout();
+            // prevent the button from deduplicating
+            if (!left_menu->getChildByID("edit-button"_spr)) {
+                left_menu->addChild(edit_button);
+                left_menu->updateLayout();
+            }
         }
     }
 };
