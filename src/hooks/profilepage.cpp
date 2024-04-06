@@ -73,6 +73,12 @@ class $modify(BetterProfilePage, ProfilePage) {
         current_profile_page = nullptr;
     }
 
+    void onUpdate(cocos2d::CCObject* sender) {
+        ProfilePage::onUpdate(sender);
+        this->fetchProfileData(this->m_accountID);
+        log::info("onUpdate");
+    }
+
     // -- non-hooks below --
 
     void onEditButton(CCObject*) {
