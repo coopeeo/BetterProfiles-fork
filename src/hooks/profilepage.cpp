@@ -2,6 +2,7 @@
 #include <Geode/modify/ProfilePage.hpp>
 
 #include "structs.hpp"
+#include "ui/editpage.hpp"
 
 using namespace geode::prelude;
 
@@ -31,7 +32,7 @@ class $modify(BetterProfilePage, ProfilePage) {
         this->m_mainLayer->addChild(m_fields->m_pronoun_label);
 
         web::AsyncWebRequest()
-            .fetch(fmt::format("http://localhost:61475/api/v1/profiles/{}", accountID))
+            .fetch(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", accountID))
             .json()
             .then([this](matjson::Value const& response) {
                 if (!response["success"].as_bool()) {
@@ -70,7 +71,7 @@ class $modify(BetterProfilePage, ProfilePage) {
             auto edit_button = CCMenuItemSpriteExtra::create(
                 CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png"),
                 this,
-                nullptr
+                menu_selector(BetterProfilePage::onEditButton)
             );
             edit_button->setID("edit-button"_spr);
             
@@ -86,5 +87,9 @@ class $modify(BetterProfilePage, ProfilePage) {
                 left_menu->updateLayout();
             }
         }
+    }
+
+    void onEditButton(CCObject*) {
+        EditPage::create(m_fields->m_profile_data)->show();
     }
 };

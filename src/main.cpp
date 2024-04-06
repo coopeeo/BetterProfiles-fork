@@ -27,7 +27,7 @@ class $modify(MyMenuLayer, MenuLayer) {
 	}
 
 	void onMyButton(CCObject*) {
-		dashauth::DashAuthRequest().getToken(Mod::get(), "https://gd-backend.foxgirl.wtf/api/v1")->except([]() {
+		dashauth::DashAuthRequest().getToken(Mod::get(), "https://gd-backend.foxgirl.wtf/api/v1")->except([](std::string const& error) {
 			log::info("failed to get token :c");
 			FLAlertLayer::create("DashAuth Error", "failed to get token :c", "OK")->show();
 		})->then([](std::string const& token) {
