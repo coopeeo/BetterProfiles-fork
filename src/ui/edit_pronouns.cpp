@@ -74,24 +74,33 @@ std::string EditPronounsPopup::getModifiedPronouns(std::vector<std::string> pron
         }
         pronouns.erase(pronouns.begin() + (set - 1));
     } else {
-        pronouns.at(set - 1) = pronoun;
+        if (!(set > 1 && (pronouns.at(set - 2) == pronoun || set > 2 && pronouns.at(set - 3) == pronoun))) {
+            pronouns.at(set - 1) = pronoun;
+        } else {
+            pronouns.erase(pronouns.begin() + (set - 1));
+        }
     }
 
+    int pronoun_set_count = pronouns.size();
     std::string new_pronouns = "";
     for (auto const& p : pronouns) {
-        new_pronouns += p + "/";
+        if (p != "") {
+            new_pronouns += p + "/";
+        } else {
+            pronoun_set_count--;
+        }
     }
     new_pronouns.pop_back();
 
-    if (pronouns.size() == 1) {
+    if (pronoun_set_count == 1) {
         std::string second_pronoun;
-        if (pronouns.at(0) == "they") {
+        if (new_pronouns == "they") {
             second_pronoun = "them";
-        } else if (pronouns.at(0) == "it") {
+        } else if (new_pronouns == "it") {
             second_pronoun = "its";
-        } else if (pronouns.at(0) == "she") {
+        } else if (new_pronouns == "she") {
             second_pronoun = "her";
-        } else if (pronouns.at(0) == "he") {
+        } else if (new_pronouns == "he") {
             second_pronoun = "him";
         }
         new_pronouns += "/" + second_pronoun;
