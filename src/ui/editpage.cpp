@@ -119,6 +119,7 @@ void EditPage::onLogin(CCObject*) {
             }
 
             if(current_edit_page->m_login_loading_circle) {
+                current_edit_page->m_login_loading_circle->fadeAndRemove();
                 current_edit_page->m_login_loading_circle->removeFromParent();
                 current_edit_page->m_login_loading_circle = nullptr;
             }
