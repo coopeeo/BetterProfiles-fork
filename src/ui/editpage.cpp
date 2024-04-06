@@ -2,6 +2,7 @@
 
 #include "ui/editpage.hpp"
 #include "ui/edit_pronouns.hpp"
+#include <UIBuilder.hpp>
 
 using namespace geode::prelude;
 
@@ -19,7 +20,6 @@ EditPage* EditPage::create(ProfileData const& profile_data) {
         ret->autorelease();
         return ret;
     }
-    
     CC_SAFE_DELETE(ret);
     return nullptr;
 }
@@ -28,36 +28,34 @@ bool EditPage::setup(ProfileData const& profile_data) {
     current_edit_page = this;
     auto win_size = CCDirector::sharedDirector()->getWinSize();
     
-    this->setTitle("Customize Profile");
+    setTitle("Customize Profile");
 
     // if the user isn't logged in, show a login button
     if (Mod::get()->getSavedValue<std::string>("token", "").empty()) {
         log::info("not logged in!");
 
-        auto button_sprite = ButtonSprite::create("Login", 64, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f);
-
-        this->m_login_button = CCMenuItemSpriteExtra::create(
-            button_sprite,
-            this,
-            menu_selector(EditPage::onLogin)
-        );
-        this->m_login_button->setID("login-button"_spr);
-        this->m_login_button->setPosition(0.f, -96.f); // 0 0 is center because menu is centered and cocos is weird :>
-
-        this->m_buttonMenu->addChild(this->m_login_button);
+        Build<ButtonSprite>::create("Login", 64, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
+            .store(m_login_sprite)
+            .intoMenuItem([this](auto) {
+                this->onLogin(nullptr);
+            })
+                .store(m_login_button)
+                .id("login-button"_spr)
+                .pos(0.f, -96.f)
+                .parent(m_buttonMenu);
 
         // login prompt
-        this->m_login_prompt_1 = CCLabelBMFont::create("You aren't logged in!", "bigFont.fnt");
-        this->m_login_prompt_2 = CCLabelBMFont::create("Click the button below to log in.", "bigFont.fnt");
-        this->m_login_prompt_1->setID("login-prompt-1"_spr);
-        this->m_login_prompt_2->setID("login-prompt-2"_spr);
-        this->m_login_prompt_1->setScale(0.75f);
-        this->m_login_prompt_2->setScale(0.65f);
-        this->m_login_prompt_1->setPosition(win_size / 2 + ccp(0.f, 22.f));
-        this->m_login_prompt_2->setPosition(win_size / 2);
-
-        this->m_mainLayer->addChild(this->m_login_prompt_1);
-        this->m_mainLayer->addChild(this->m_login_prompt_2);
+        Build<CCLabelBMFont>::create("You aren't logged in!", "bigFont.fnt")
+            .id("login-prompt-1"_spr)
+            .scale(0.75f)
+            .pos(win_size / 2 + ccp(0.f, 22.f))
+            .parent(m_mainLayer)
+            .store(m_login_prompt_1)
+            .intoNewSibling(CCLabelBMFont::create("Click the button below to log in.", "bigFont.fnt"))
+                .id("login-prompt-2"_spr)
+                .scale(0.65f)
+                .pos(win_size / 2)
+                .store(m_login_prompt_2);
 
         return true;
     }
@@ -78,56 +76,52 @@ void EditPage::setupLoggedIn() {
     auto win_size = CCDirector::sharedDirector()->getWinSize();
 
     // actual UI setup below
-    auto main_menu = CCMenu::create();
-    main_menu->setPosition(win_size / 2);
-    main_menu->setLayout(ColumnLayout::create());
+    auto main_menu = Build<CCMenu>::create()
+        .pos(win_size / 2)
+        .layout(ColumnLayout::create())
+        .parent(m_mainLayer)
+        .collect();
     
-    auto label = CCLabelBMFont::create("meow", "bigFont.fnt");
-    main_menu->addChild(label);
-
-    this->m_mainLayer->addChild(main_menu);
+    Build<CCLabelBMFont>::create("meow", "bigFont.fnt")
+        .parent(main_menu);
 
     // create update buttons for each field in the profile data
 
     // pronouns
-    auto pronouns_button = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("Change Pronouns", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
-        this,
-        menu_selector(EditPage::onEditPronouns)
-    );
-    pronouns_button->setID("pronouns-button"_spr);
-    main_menu->addChild(pronouns_button);
+    Build<ButtonSprite>::create("Change Pronouns", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
+        .intoMenuItem([this](auto) {
+            this->onEditPronouns(nullptr);
+        })
+        .id("pronouns-button"_spr)
+        .parent(main_menu);
 
     // bio
-    auto bio_button = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("Change Bio", 80, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
-        this,
-        nullptr
-    );
-    bio_button->setID("bio-button"_spr);
-    main_menu->addChild(bio_button);
+    Build<ButtonSprite>::create("Change Bio", 80, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
+        .intoMenuItem([](auto) {
+
+        })
+        .id("bio-button"_spr)
+        .parent(main_menu);
 
     // socials
-    auto socials_button = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("Change Socials", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
-        this,
-        nullptr
-    );
-    socials_button->setID("socials-button"_spr);
-    main_menu->addChild(socials_button);
+    Build<ButtonSprite>::create("Change Socials", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
+        .intoMenuItem([](auto) {
+
+        })
+        .id("socials-button"_spr)
+        .parent(main_menu);
 
     main_menu->updateLayout();
 
     // save button
-    this->m_save_button = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("Save", 64, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
-        this,
-        menu_selector(EditPage::onSave)
-    );
-    this->m_save_button->setID("save-button"_spr);
-    this->m_save_button->setPosition(0.f, -96.f);
-    this->m_save_button->setVisible(false);
-    this->m_buttonMenu->addChild(this->m_save_button);
+    Build<ButtonSprite>::create("Save", 64, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
+        .intoMenuItem([this](auto) {
+            this->onSave(nullptr);
+        })
+        .id("save-button"_spr)
+        .visible(false)
+        .parent(m_buttonMenu)
+        .store(m_save_button);
 }
 
 void EditPage::onLogin(CCObject*) {
@@ -135,24 +129,22 @@ void EditPage::onLogin(CCObject*) {
 
     // hide login prompt, make button unclickable and grayed out, show loading circle
 
-    if(this->m_login_prompt_1) this->m_login_prompt_1->setVisible(false);
-    if(this->m_login_prompt_2) this->m_login_prompt_2->setVisible(false);
-    if(this->m_login_button) {
-        this->m_login_button->setEnabled(false);
+    if(m_login_prompt_1) m_login_prompt_1->setVisible(false);
+    if(m_login_prompt_2) m_login_prompt_2->setVisible(false);
+    if(m_login_button) {
+        m_login_button->setEnabled(false);
         
-        auto button_child = this->m_login_button->getChildren()->objectAtIndex(0);
-        if (auto button_sprite = typeinfo_cast<ButtonSprite*>(button_child)) {
-            button_sprite->setString("Loading...");
-            button_sprite->updateBGImage("GJ_button_04.png");
-            button_sprite->m_label->setColor(ccc3(175, 175, 175));
-        }
+        m_login_sprite->setString("Loading...");
+        m_login_sprite->updateBGImage("GJ_button_04.png");
+        m_login_sprite->m_label->setColor(ccc3(175, 175, 175));
     }
-
     // create loading circle
-    this->m_login_loading_circle = LoadingCircle::create();
-    this->m_login_loading_circle->setPosition(0.f, 0.f);
-    this->m_login_loading_circle->show();
-    this->m_mainLayer->addChild(this->m_login_loading_circle);
+    Build<LoadingCircle>::create()
+        .pos(0.f, 0.f)
+        .id("loading_circle"_spr)
+        .parent(m_mainLayer)
+        .store(m_login_loading_circle);
+    m_login_loading_circle->
 
     dashauth::DashAuthRequest().getToken(Mod::get(), "https://gd-backend.foxgirl.wtf/api/v1")->except([](std::string const& error) {
         log::info("login failed: {}", error);

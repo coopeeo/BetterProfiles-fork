@@ -28,6 +28,7 @@ protected:
     // members - nodes
     CCLabelBMFont* m_login_prompt_1 = nullptr;
     CCLabelBMFont* m_login_prompt_2 = nullptr;
+    ButtonSprite* m_login_sprite = nullptr;
     CCMenuItemSpriteExtra* m_login_button = nullptr;
     LoadingCircle* m_login_loading_circle = nullptr;
     CCMenuItemSpriteExtra* m_save_button = nullptr;
