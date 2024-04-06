@@ -89,7 +89,7 @@ class $modify(BetterProfilePage, ProfilePage) {
         web::AsyncWebRequest()
             .fetch(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", account_id))
             .json()
-            .then([](matjson::Value const& response) {
+            .then([account_id](matjson::Value const& response) {
                 if (!response["success"].as_bool()) {
                     log::error("failed to fetch profile data");
                     return;
@@ -105,7 +105,15 @@ class $modify(BetterProfilePage, ProfilePage) {
 
                 // parse data and update UI
                 current_profile_page->m_fields->m_profile_data = response["data"].as<ProfileData>();
+                current_profile_page->m_fields->m_profile_data.id = account_id;
                 current_profile_page->updateUIState();
+        }).expect([account_id](std::string const& error) {
+            log::error("failed to fetch profile data: {}", error);
+            if (current_profile_page != nullptr) {
+                current_profile_page->m_fields->m_profile_data = ProfileData();
+                current_profile_page->m_fields->m_profile_data.id = account_id;
+                current_profile_page->updateUIState();
+            }
         });
     }
 

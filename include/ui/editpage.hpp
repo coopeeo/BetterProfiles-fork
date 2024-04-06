@@ -11,12 +11,15 @@ protected:
 
     virtual void keyDown(cocos2d::enumKeyCodes key) override;
 
+    virtual void draw() override;
+
     // ui funcs
     void setupLoggedIn();
 
     // callbacks
     void onLogin(CCObject*);
     void onEditPronouns(CCObject*);
+    void onSave(CCObject*);
 
     // members
     ProfileData m_profile_data;
@@ -27,6 +30,8 @@ protected:
     CCLabelBMFont* m_login_prompt_2 = nullptr;
     CCMenuItemSpriteExtra* m_login_button = nullptr;
     LoadingCircle* m_login_loading_circle = nullptr;
+    CCMenuItemSpriteExtra* m_save_button = nullptr;
+    LoadingCircle* m_save_loading_circle = nullptr;
 public:
     static EditPage* create(ProfileData const& profile_data);
 };

@@ -117,6 +117,17 @@ void EditPage::setupLoggedIn() {
     main_menu->addChild(socials_button);
 
     main_menu->updateLayout();
+
+    // save button
+    this->m_save_button = CCMenuItemSpriteExtra::create(
+        ButtonSprite::create("Save", 64, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
+        this,
+        menu_selector(EditPage::onSave)
+    );
+    this->m_save_button->setID("save-button"_spr);
+    this->m_save_button->setPosition(0.f, -96.f);
+    this->m_save_button->setVisible(false);
+    this->m_buttonMenu->addChild(this->m_save_button);
 }
 
 void EditPage::onLogin(CCObject*) {
@@ -190,6 +201,38 @@ void EditPage::onEditPronouns(CCObject*) {
     EditPronounsPopup::create(&(this->m_profile_data))->show();
 }
 
+void EditPage::onSave(CCObject*) {
+    log::info("saving profile data");
+
+    // loading circle !!
+    this->m_save_loading_circle = LoadingCircle::create();
+    this->m_save_loading_circle->setPosition(0.f, 0.f);
+    this->m_save_loading_circle->show();
+    this->m_mainLayer->addChild(this->m_save_loading_circle);
+
+    // save the profile data
+    geode::utils::web::AsyncWebRequest()
+        .body(this->m_profile_data)
+        .header(fmt::format("Authorization: Bearer {}", Mod::get()->getSavedValue<std::string>("token", "")))
+        .post(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", this->m_profile_data.id))
+        .json()
+        .then([](matjson::Value const& response) {
+            log::info("saved profile data !!");
+            if (current_edit_page == nullptr) return;
+            current_edit_page->m_original_data = current_edit_page->m_profile_data;
+            current_edit_page->m_save_loading_circle->fadeAndRemove();
+            current_edit_page->m_save_loading_circle->removeFromParent();
+            current_edit_page->m_save_loading_circle = nullptr;
+            current_edit_page->removeFromParent();
+        }).expect([](std::string const& error) {
+            log::info("failed to save profile data: {}", error);
+            if (current_edit_page == nullptr) return;
+            current_edit_page->m_save_loading_circle->fadeAndRemove();
+            current_edit_page->m_save_loading_circle->removeFromParent();
+            current_edit_page->m_save_loading_circle = nullptr;
+        });
+}
+
 void EditPage::keyDown(cocos2d::enumKeyCodes key) {
     if (key == cocos2d::enumKeyCodes::KEY_Escape && (this->m_profile_data != this->m_original_data)) {
         geode::createQuickPopup(
@@ -204,5 +247,17 @@ void EditPage::keyDown(cocos2d::enumKeyCodes key) {
         );
     } else {
         geode::Popup<ProfileData const&>::keyDown(key);
+    }
+}
+
+// draw is called every frame, so we can "hook" it to determine when to show the save button
+void EditPage::draw() {
+    geode::Popup<ProfileData const&>::draw();
+    if (this->m_save_button == nullptr) return;
+
+    if (this->m_profile_data != this->m_original_data) {
+        this->m_save_button->setVisible(true);
+    } else {
+        this->m_save_button->setVisible(false);
     }
 }
