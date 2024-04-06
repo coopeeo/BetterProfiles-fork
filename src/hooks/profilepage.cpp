@@ -34,27 +34,7 @@ class $modify(BetterProfilePage, ProfilePage) {
         m_fields->m_pronoun_label->setVisible(false);
         this->m_mainLayer->addChild(m_fields->m_pronoun_label);
 
-        web::AsyncWebRequest()
-            .fetch(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", accountID))
-            .json()
-            .then([](matjson::Value const& response) {
-                if (!response["success"].as_bool()) {
-                    log::error("failed to fetch profile data");
-                    return;
-                }
-
-                // don't touch UI if it doesn't exist anymore
-                if (current_profile_page == nullptr) {
-                    log::warn("current_profile_page is null (user exited ui), not updating profile data");
-                    return;
-                }
-
-                log::info("fetched profile data");
-
-                // parse data and update UI
-                current_profile_page->m_fields->m_profile_data = response["data"].as<ProfileData>();
-                current_profile_page->updateUIState();
-            });
+        this->fetchProfileData(accountID);
 
         return true;
     }
@@ -97,6 +77,30 @@ class $modify(BetterProfilePage, ProfilePage) {
 
     void onEditButton(CCObject*) {
         EditPage::create(m_fields->m_profile_data)->show();
+    }
+
+    void fetchProfileData(int account_id) {
+        web::AsyncWebRequest()
+            .fetch(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", account_id))
+            .json()
+            .then([](matjson::Value const& response) {
+                if (!response["success"].as_bool()) {
+                    log::error("failed to fetch profile data");
+                    return;
+                }
+
+                // don't touch UI if it doesn't exist anymore
+                if (current_profile_page == nullptr) {
+                    log::warn("current_profile_page is null (user exited ui), not updating profile data");
+                    return;
+                }
+
+                log::info("fetched profile data");
+
+                // parse data and update UI
+                current_profile_page->m_fields->m_profile_data = response["data"].as<ProfileData>();
+                current_profile_page->updateUIState();
+        });
     }
 
     // updates UI based on m_profile_data
