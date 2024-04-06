@@ -14,6 +14,8 @@ struct ProfileData {
     std::optional<std::string> social_tumblr;
     std::optional<std::string> social_myspace;
     std::optional<std::string> social_facebook;
+
+    auto operator<=>(const ProfileData&) const = default;
 };
 
 template <>

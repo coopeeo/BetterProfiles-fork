@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <rooot.dashauth/include/dashauth.hpp>
 
+#include "ui/edit_pronouns.hpp"
 #include "structs.hpp"
 
 class EditPage : public geode::Popup<ProfileData const&> {
@@ -15,10 +16,11 @@ protected:
 
     // callbacks
     void onLogin(CCObject*);
+    void onEditPronouns(CCObject*);
 
     // members
     ProfileData m_profile_data;
-    bool m_data_changed = false;
+    ProfileData m_original_data;
 
     // members - nodes
     CCLabelBMFont* m_login_prompt_1 = nullptr;

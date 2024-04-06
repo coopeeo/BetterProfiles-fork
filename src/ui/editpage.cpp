@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 
 #include "ui/editpage.hpp"
+#include "ui/edit_pronouns.hpp"
 
 using namespace geode::prelude;
 
@@ -14,6 +15,7 @@ EditPage* EditPage::create(ProfileData const& profile_data) {
     auto ret = new EditPage();
     if (ret && ret->init(450.f, 280.f, profile_data)) {
         ret->m_profile_data = profile_data;
+        ret->m_original_data = profile_data;
         ret->autorelease();
         return ret;
     }
@@ -91,7 +93,7 @@ void EditPage::setupLoggedIn() {
     auto pronouns_button = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Change Pronouns", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
         this,
-        nullptr
+        menu_selector(EditPage::onEditPronouns)
     );
     pronouns_button->setID("pronouns-button"_spr);
     main_menu->addChild(pronouns_button);
@@ -181,8 +183,15 @@ void EditPage::onLogin(CCObject*) {
     });
 }
 
+void EditPage::onEditPronouns(CCObject*) {
+    // user clicked the pronouns button
+    log::info("edit pronouns");
+
+    EditPronounsPopup::create(&(this->m_profile_data))->show();
+}
+
 void EditPage::keyDown(cocos2d::enumKeyCodes key) {
-    if (key == cocos2d::enumKeyCodes::KEY_Escape && this->m_data_changed) {
+    if (key == cocos2d::enumKeyCodes::KEY_Escape && (this->m_profile_data != this->m_original_data)) {
         geode::createQuickPopup(
             "Warning",
             "You have <cr>unsaved changes!</c> Do you want to <cr>discard</c> them?",
