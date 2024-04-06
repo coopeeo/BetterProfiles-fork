@@ -10,6 +10,18 @@ EditPage::~EditPage() {
     current_edit_page = nullptr;
 }
 
+EditPage* EditPage::create(ProfileData const& profile_data) {
+    auto ret = new EditPage();
+    if (ret && ret->init(450.f, 280.f, profile_data)) {
+        ret->m_profile_data = profile_data;
+        ret->autorelease();
+        return ret;
+    }
+    
+    CC_SAFE_DELETE(ret);
+    return nullptr;
+}
+
 bool EditPage::setup(ProfileData const& profile_data) {
     current_edit_page = this;
     auto win_size = CCDirector::sharedDirector()->getWinSize();
@@ -167,18 +179,6 @@ void EditPage::onLogin(CCObject*) {
             current_edit_page->setupLoggedIn();
         }
     });
-}
-
-EditPage* EditPage::create(ProfileData const& profile_data) {
-    auto ret = new EditPage();
-    if (ret && ret->init(450.f, 280.f, profile_data)) {
-        ret->m_profile_data = profile_data;
-        ret->autorelease();
-        return ret;
-    }
-    
-    CC_SAFE_DELETE(ret);
-    return nullptr;
 }
 
 void EditPage::keyDown(cocos2d::enumKeyCodes key) {
