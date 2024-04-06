@@ -8,6 +8,8 @@ protected:
     ~EditPage();
     bool setup(ProfileData const& profile_data) override;
 
+    virtual void keyDown(cocos2d::enumKeyCodes key) override;
+
     // ui funcs
     void setupLoggedIn();
 
@@ -16,6 +18,7 @@ protected:
 
     // members
     ProfileData m_profile_data;
+    bool m_data_changed = false;
 
     // members - nodes
     CCLabelBMFont* m_login_prompt_1 = nullptr;

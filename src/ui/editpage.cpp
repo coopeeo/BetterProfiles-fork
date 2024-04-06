@@ -66,11 +66,43 @@ void EditPage::setupLoggedIn() {
     // actual UI setup below
     auto main_menu = CCMenu::create();
     main_menu->setPosition(win_size / 2);
+    main_menu->setLayout(ColumnLayout::create());
     
     auto label = CCLabelBMFont::create("meow", "bigFont.fnt");
     main_menu->addChild(label);
 
     this->m_mainLayer->addChild(main_menu);
+
+    // create update buttons for each field in the profile data
+
+    // pronouns
+    auto pronouns_button = CCMenuItemSpriteExtra::create(
+        ButtonSprite::create("Change Pronouns", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
+        this,
+        nullptr
+    );
+    pronouns_button->setID("pronouns-button"_spr);
+    main_menu->addChild(pronouns_button);
+
+    // bio
+    auto bio_button = CCMenuItemSpriteExtra::create(
+        ButtonSprite::create("Change Bio", 80, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
+        this,
+        nullptr
+    );
+    bio_button->setID("bio-button"_spr);
+    main_menu->addChild(bio_button);
+
+    // socials
+    auto socials_button = CCMenuItemSpriteExtra::create(
+        ButtonSprite::create("Change Socials", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f),
+        this,
+        nullptr
+    );
+    socials_button->setID("socials-button"_spr);
+    main_menu->addChild(socials_button);
+
+    main_menu->updateLayout();
 }
 
 void EditPage::onLogin(CCObject*) {
@@ -147,4 +179,21 @@ EditPage* EditPage::create(ProfileData const& profile_data) {
     
     CC_SAFE_DELETE(ret);
     return nullptr;
+}
+
+void EditPage::keyDown(cocos2d::enumKeyCodes key) {
+    if (key == cocos2d::enumKeyCodes::KEY_Escape && this->m_data_changed) {
+        geode::createQuickPopup(
+            "Warning",
+            "You have <cr>unsaved changes!</c> Do you want to <cr>discard</c> them?",
+            "Go back", "Discard",
+            [this, key](auto, bool discard) {
+                if (discard) {
+                    geode::Popup<ProfileData const&>::keyDown(key);
+                }
+            }
+        );
+    } else {
+        geode::Popup<ProfileData const&>::keyDown(key);
+    }
 }
