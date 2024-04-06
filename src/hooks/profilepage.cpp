@@ -9,12 +9,15 @@ using namespace geode::prelude;
 class $modify(BetterProfilePage, ProfilePage) {
     CCLabelBMFont* m_pronoun_label;
     ProfileData m_profile_data;
+    static inline BetterProfilePage* current_profile_page = nullptr;
 
     bool init(int accountID, bool ownProfile) {
         if (!ProfilePage::init(accountID, ownProfile)) {
             return false;
         }
         log::info("init profilepage");
+
+        current_profile_page = this;
 
         if (this->m_usernameLabel == nullptr) {
             log::error("m_usernameLabel is null");
@@ -34,11 +37,20 @@ class $modify(BetterProfilePage, ProfilePage) {
         web::AsyncWebRequest()
             .fetch(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", accountID))
             .json()
-            .then([this](matjson::Value const& response) {
+            .then([](matjson::Value const& response) {
                 if (!response["success"].as_bool()) {
                     log::error("failed to fetch profile data");
                     return;
                 }
+
+                // don't touch UI if it doesn't exist anymore
+                if (current_profile_page == nullptr) {
+                    log::warn("current_profile_page is null (user exited ui), not updating profile data");
+                    return;
+                }
+
+                auto self = current_profile_page;
+
                 log::info("fetched profile data");
                 auto data = response["data"];
 
@@ -46,16 +58,16 @@ class $modify(BetterProfilePage, ProfilePage) {
                 auto bio = data.try_get<std::string>("bio");
                 log::info("bio: {}", bio.value_or("null"));
 
-                m_fields->m_profile_data = data.as<ProfileData>();
+                self->m_fields->m_profile_data = data.as<ProfileData>();
 
                 log::debug("i am so confused");
 
-                if (m_fields->m_profile_data.pronouns.has_value()) {
+                if (self->m_fields->m_profile_data.pronouns.has_value()) {
                     log::debug("settings pronoun label");
-                    log::debug("pronouns: {}", m_fields->m_profile_data.pronouns.value());
+                    log::debug("pronouns: {}", self->m_fields->m_profile_data.pronouns.value());
 
-                    m_fields->m_pronoun_label->setString(m_fields->m_profile_data.pronouns.value().c_str());
-                    m_fields->m_pronoun_label->setVisible(true);
+                    self->m_fields->m_pronoun_label->setString(self->m_fields->m_profile_data.pronouns.value().c_str());
+                    self->m_fields->m_pronoun_label->setVisible(true);
                 }
             });
 
@@ -89,6 +101,14 @@ class $modify(BetterProfilePage, ProfilePage) {
         }
     }
 
+    // prevent crashes
+    void onClose(cocos2d::CCObject* sender) {
+        ProfilePage::onClose(sender);
+        log::info("onClose");
+        current_profile_page = nullptr;
+    }
+
+    // not a hook
     void onEditButton(CCObject*) {
         EditPage::create(m_fields->m_profile_data)->show();
     }
