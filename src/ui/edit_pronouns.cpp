@@ -137,15 +137,15 @@ void EditPronounsPopup::updateUI() {
 
         // loop over set_menu children
         for (int j = 0; j < set_menu->getChildren()->count(); j++) {
-            if (auto button = typeinfo_cast<CCMenuItemSpriteExtra*>(set_menu->getChildren()->objectAtIndex(j))) {
-                if (auto button_sprite = typeinfo_cast<ButtonSprite*>(button->getChildren()->objectAtIndex(0))) {
+            if (auto button = getChildOfType<CCMenuItemSpriteExtra>(set_menu, j)) {
+                if (auto button_sprite = getChildOfType<ButtonSprite>(button, 0)) {
                     button_sprite->updateBGImage(TEXTURE_BUTTON_DISABLED);
                 }
             }
         }
 
         if (auto button = typeinfo_cast<CCMenuItemSpriteExtra*>(set_menu->getChildByID(pronoun))) {
-            if (auto button_sprite = typeinfo_cast<ButtonSprite*>(button->getChildren()->objectAtIndex(0))) {
+            if (auto button_sprite = getChildOfType<ButtonSprite>(button, 0)) {
                 button_sprite->updateBGImage(TEXTURE_BUTTON_ENABLED);
             }
         }
