@@ -144,7 +144,7 @@ void EditPage::onLogin(CCObject*) {
         .id("loading_circle"_spr)
         .parent(m_mainLayer)
         .store(m_login_loading_circle);
-    m_login_loading_circle->
+    m_login_loading_circle->show();
 
     dashauth::DashAuthRequest().getToken(Mod::get(), "https://gd-backend.foxgirl.wtf/api/v1")->except([](std::string const& error) {
         log::info("login failed: {}", error);
