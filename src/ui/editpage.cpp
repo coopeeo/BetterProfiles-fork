@@ -152,12 +152,11 @@ void EditPage::onLogin(CCObject*) {
             if(current_edit_page->m_login_prompt_1) current_edit_page->m_login_prompt_1->setVisible(true);
             if(current_edit_page->m_login_prompt_2) current_edit_page->m_login_prompt_2->setVisible(true);
             log::info("set login prompt visible");
-            
+
             if(current_edit_page->m_login_button) {
                 current_edit_page->m_login_button->setEnabled(true);
-            
-                auto button_child = current_edit_page->m_login_button->getChildren()->objectAtIndex(0);
-                if (auto button_sprite = typeinfo_cast<ButtonSprite*>(button_child)) {
+
+                if (auto button_sprite = getChildOfType<ButtonSprite>(current_edit_page->m_login_button, 0)) {
                     button_sprite->setString("Login");
                     button_sprite->updateBGImage("GJ_button_01.png");
                     button_sprite->m_label->setColor(ccWHITE);
