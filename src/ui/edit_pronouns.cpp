@@ -34,7 +34,7 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
 
     Build<CCMenu>::create()
         .id("pronoun-sets-menu"_spr)
-        .layout(RowLayout::create())
+        .layout(RowLayout::create()->setGap(18.f))
         .pos(win_size / 2)
         .parent(m_mainLayer)
         .store(m_pronoun_sets_menu);
@@ -182,6 +182,10 @@ CCMenu* EditPronounsPopup::createPronounSet(int set) {
         .intoMenuItem([this, set](auto) {
             this->onPronounButtonClicked(set, "he");
         }).id("he").parent(menu);
+    
+    Build<CCLabelBMFont>::create(fmt::format("set {}", set).c_str(), "goldFont.fnt")
+        .scale(0.5f)
+        .parent(menu);
 
     menu->updateLayout();
 
