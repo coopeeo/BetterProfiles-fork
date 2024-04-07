@@ -114,6 +114,7 @@ void EditPage::setupLoggedIn() {
         .intoMenuItem([this](auto) {
             this->onSave(nullptr);
         })
+        .pos(0.f, -96.f)
         .id("save-button"_spr)
         .visible(false)
         .parent(m_buttonMenu)
