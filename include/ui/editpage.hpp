@@ -17,9 +17,9 @@ protected:
     void setupLoggedIn();
 
     // callbacks
-    void onLogin(CCObject*);
-    void onEditPronouns(CCObject*);
-    void onSave(CCObject*);
+    void onLogin();
+    void onEditPronouns();
+    void onSave();
 
     // members
     ProfileData m_profile_data;

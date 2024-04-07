@@ -37,7 +37,7 @@ bool EditPage::setup(ProfileData const& profile_data) {
         Build<ButtonSprite>::create("Login", 64, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
             .store(m_login_sprite)
             .intoMenuItem([this](auto) {
-                this->onLogin(nullptr);
+                this->onLogin();
             })
                 .store(m_login_button)
                 .id("login-button"_spr)
@@ -90,7 +90,7 @@ void EditPage::setupLoggedIn() {
     // pronouns
     Build<ButtonSprite>::create("Change Pronouns", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
         .intoMenuItem([this](auto) {
-            this->onEditPronouns(nullptr);
+            this->onEditPronouns();
         })
         .id("pronouns-button"_spr)
         .parent(main_menu);
@@ -112,7 +112,7 @@ void EditPage::setupLoggedIn() {
     // save button
     Build<ButtonSprite>::create("Save", 64, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
         .intoMenuItem([this](auto) {
-            this->onSave(nullptr);
+            this->onSave();
         })
         .pos(0.f, -96.f)
         .id("save-button"_spr)
@@ -121,7 +121,7 @@ void EditPage::setupLoggedIn() {
         .store(m_save_button);
 }
 
-void EditPage::onLogin(CCObject*) {
+void EditPage::onLogin() {
     // user clicked the login button
 
     // hide login prompt, make button unclickable and grayed out, show loading circle
@@ -182,14 +182,14 @@ void EditPage::onLogin(CCObject*) {
     });
 }
 
-void EditPage::onEditPronouns(CCObject*) {
+void EditPage::onEditPronouns() {
     // user clicked the pronouns button
     log::info("edit pronouns");
 
     EditPronounsPopup::create(&(this->m_profile_data))->show();
 }
 
-void EditPage::onSave(CCObject*) {
+void EditPage::onSave() {
     log::info("saving profile data");
 
     // loading circle !!
