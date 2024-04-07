@@ -193,10 +193,12 @@ void EditPage::onSave(CCObject*) {
     log::info("saving profile data");
 
     // loading circle !!
-    this->m_save_loading_circle = LoadingCircle::create();
-    this->m_save_loading_circle->setPosition(0.f, 0.f);
-    this->m_save_loading_circle->show();
-    this->m_mainLayer->addChild(this->m_save_loading_circle);
+    Build<LoadingCircle>::create()
+        .pos(0.f, 0.f)
+        .id("loading_circle"_spr)
+        .parent(m_mainLayer)
+        .store(m_save_loading_circle);
+    m_save_loading_circle->show();
 
     // save the profile data
     geode::utils::web::AsyncWebRequest()

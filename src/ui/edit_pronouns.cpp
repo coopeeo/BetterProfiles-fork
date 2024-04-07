@@ -1,4 +1,5 @@
 #include <Geode/Geode.hpp>
+#include <UIBuilder.hpp>
 #include <string>
 #include <vector>
 
@@ -24,21 +25,25 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
 
     this->setTitle("Change Pronouns");
 
-    this->m_pronouns_label = CCLabelBMFont::create("meow", "bigFont.fnt");
-    this->m_pronouns_label->setPosition(win_size.width / 2, 60.f);
-    this->m_pronouns_label->setScale(0.75f);
-    this->m_mainLayer->addChild(this->m_pronouns_label);
+    Build<CCLabelBMFont>::create("meow", "bigFont.fnt")
+        .id("pronouns-label"_spr)
+        .pos(win_size.width / 2, 60.f)
+        .scale(0.75f)
+        .parent(m_mainLayer)
+        .store(m_pronouns_label);
 
-    auto pronoun_sets_menu = CCMenu::create();
-    pronoun_sets_menu->setLayout(RowLayout::create());
-    pronoun_sets_menu->setPosition(win_size / 2);
-    pronoun_sets_menu->setID("pronoun-sets-menu"_spr);
-    pronoun_sets_menu->addChild(this->createPronounSet(1));
-    pronoun_sets_menu->addChild(this->createPronounSet(2));
-    pronoun_sets_menu->addChild(this->createPronounSet(3));
-    pronoun_sets_menu->updateLayout();
+    Build<CCMenu>::create()
+        .id("pronoun-sets-menu"_spr)
+        .layout(RowLayout::create())
+        .pos(win_size / 2)
+        .parent(m_mainLayer)
+        .store(m_pronoun_sets_menu);
 
-    this->m_mainLayer->addChild(pronoun_sets_menu);
+    // idk how to UIBuilder-ify these
+    m_pronoun_sets_menu->addChild(this->createPronounSet(1));
+    m_pronoun_sets_menu->addChild(this->createPronounSet(2));
+    m_pronoun_sets_menu->addChild(this->createPronounSet(3));
+    m_pronoun_sets_menu->updateLayout();
 
     this->parsePronouns(profile_data->pronouns.value_or(""));
     this->updateUI();
@@ -110,15 +115,7 @@ std::string EditPronounsPopup::getModifiedPronouns(std::vector<std::string> pron
 }
 
 void EditPronounsPopup::updateUI() {
-    auto menu = typeinfo_cast<CCMenu*>(this->m_mainLayer->getChildByID("pronoun-sets-menu"_spr));
-    if (!menu) {
-        log::error("failed to get pronoun sets menu");
-        return;
-    }
-
     auto pronouns = this->parsePronouns(this->m_profile_data->pronouns.value_or(""));
-
-    auto pronoun_sets_menu = typeinfo_cast<CCMenu*>(this->m_mainLayer->getChildByID("pronoun-sets-menu"_spr));
 
     for (int i = 0; i < 3; i++) {
         auto set = i + 1;
@@ -132,7 +129,7 @@ void EditPronounsPopup::updateUI() {
 
         //log::info("pronoun {} in set {}", pronoun, set);
 
-        auto set_menu = typeinfo_cast<CCMenu*>(pronoun_sets_menu->getChildByID(fmt::format("set-{}", set)));
+        auto set_menu = typeinfo_cast<CCMenu*>(m_pronoun_sets_menu->getChildByID(fmt::format("set-{}", set)));
         if (!set_menu) {
             log::error("failed to get pronoun set menu for set {}", set);
             return;
@@ -166,37 +163,25 @@ CCMenu* EditPronounsPopup::createPronounSet(int set) {
     menu->setTag(set);
     menu->setID(fmt::format("set-{}", set));
 
-    auto pronoun_button_they = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("they/them", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f),
-        this,
-        menu_selector(EditPronounsPopup::onPronounButtonClicked)
-    );
-    pronoun_button_they->setID("they");
-    menu->addChild(pronoun_button_they);
+    Build<ButtonSprite>::create("they/them", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f)
+        .intoMenuItem([this, set](auto) {
+            this->onPronounButtonClicked(set, "they");
+        }).id("they").parent(menu);
 
-    auto pronoun_button_it = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("it/its", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f),
-        this,
-        menu_selector(EditPronounsPopup::onPronounButtonClicked)
-    );
-    pronoun_button_it->setID("it");
-    menu->addChild(pronoun_button_it);
+    Build<ButtonSprite>::create("it/its", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f)
+        .intoMenuItem([this, set](auto) {
+            this->onPronounButtonClicked(set, "it");
+        }).id("it").parent(menu);
 
-    auto pronoun_button_she = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("she/her", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f),
-        this,
-        menu_selector(EditPronounsPopup::onPronounButtonClicked)
-    );
-    pronoun_button_she->setID("she");
-    menu->addChild(pronoun_button_she);
+    Build<ButtonSprite>::create("she/her", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f)
+        .intoMenuItem([this, set](auto) {
+            this->onPronounButtonClicked(set, "she");
+        }).id("she").parent(menu);
 
-    auto pronoun_button_he = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("he/him", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f),
-        this,
-        menu_selector(EditPronounsPopup::onPronounButtonClicked)
-    );
-    pronoun_button_he->setID("he");
-    menu->addChild(pronoun_button_he);
+    Build<ButtonSprite>::create("he/him", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f)
+        .intoMenuItem([this, set](auto) {
+            this->onPronounButtonClicked(set, "he");
+        }).id("he").parent(menu);
 
     menu->updateLayout();
 
@@ -204,20 +189,7 @@ CCMenu* EditPronounsPopup::createPronounSet(int set) {
 }
 
 // this should *ONLY* be called for buttons inside of a pronoun set ccmenu
-void EditPronounsPopup::onPronounButtonClicked(CCObject* sender) {
-    auto button = typeinfo_cast<CCMenuItemSpriteExtra*>(sender);
-    if (!button) {
-        return;
-    }
-
-    auto menu = typeinfo_cast<CCMenu*>(button->getParent());
-    if (!menu) {
-        return;
-    }
-
-    auto set = menu->getTag();
-    auto pronoun = button->getID();
-
+void EditPronounsPopup::onPronounButtonClicked(int set, std::string pronoun) {
     std::vector<std::string> pronouns = this->parsePronouns(this->m_profile_data->pronouns.value_or(""));
 
     //std::vector<std::string> pronouns = this->parsePronouns("she/her");

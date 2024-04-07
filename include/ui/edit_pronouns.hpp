@@ -13,10 +13,11 @@ protected:
     std::string getModifiedPronouns(std::vector<std::string> pronouns, int set, std::string pronoun);
     void updateUI();
 
-    void onPronounButtonClicked(CCObject* sender);
+    void onPronounButtonClicked(int set, std::string pronoun);
 
     ProfileData* m_profile_data;
     cocos2d::CCLabelBMFont* m_pronouns_label = nullptr;
+    cocos2d::CCMenu* m_pronoun_sets_menu = nullptr;
 public:
     static EditPronounsPopup* create(ProfileData* const& profile_data);
 };
