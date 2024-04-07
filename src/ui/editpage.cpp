@@ -28,7 +28,7 @@ bool EditPage::setup(ProfileData const& profile_data) {
     current_edit_page = this;
     auto win_size = CCDirector::sharedDirector()->getWinSize();
     
-    setTitle("Customize Profile");
+    this->setTitle("Customize Profile");
 
     // if the user isn't logged in, show a login button
     if (Mod::get()->getSavedValue<std::string>("token", "").empty()) {
@@ -97,17 +97,13 @@ void EditPage::setupLoggedIn() {
 
     // bio
     Build<ButtonSprite>::create("Change Bio", 80, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
-        .intoMenuItem([](auto) {
-
-        })
+        .intoMenuItem([](auto) {})
         .id("bio-button"_spr)
         .parent(main_menu);
 
     // socials
     Build<ButtonSprite>::create("Change Socials", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
-        .intoMenuItem([](auto) {
-
-        })
+        .intoMenuItem([](auto) {})
         .id("socials-button"_spr)
         .parent(main_menu);
 
