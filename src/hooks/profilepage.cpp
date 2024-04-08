@@ -82,7 +82,12 @@ class $modify(BetterProfilePage, ProfilePage) {
     // -- non-hooks below --
 
     void onEditButton(CCObject*) {
-        EditPage::create(m_fields->m_profile_data)->show();
+        auto edit_page = EditPage::create(m_fields->m_profile_data);
+        edit_page->setCallback([this](ProfileData const& profile_data) {
+            this->m_fields->m_profile_data = profile_data;
+            this->updateUIState();
+        });
+        edit_page->show();
     }
 
     void fetchProfileData(int account_id) {

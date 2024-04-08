@@ -211,7 +211,9 @@ void EditPage::onSave() {
         .json()
         .then([](matjson::Value const& response) {
             log::info("saved profile data !!");
+
             if (current_edit_page == nullptr) return;
+            if(current_edit_page->m_callback != nullptr) current_edit_page->m_callback(current_edit_page->m_profile_data);
             current_edit_page->m_original_data = current_edit_page->m_profile_data;
             current_edit_page->m_save_loading_circle->fadeAndRemove();
             current_edit_page->m_save_loading_circle->removeFromParent();
@@ -253,4 +255,8 @@ void EditPage::draw() {
     } else {
         this->m_save_button->setVisible(false);
     }
+}
+
+void EditPage::setCallback(std::function<void(ProfileData const&)> callback) {
+    this->m_callback = callback;
 }

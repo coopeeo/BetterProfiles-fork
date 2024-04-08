@@ -24,6 +24,7 @@ protected:
     // members
     ProfileData m_profile_data;
     ProfileData m_original_data;
+    std::function<void(ProfileData const&)> m_callback = nullptr;
 
     // members - nodes
     CCLabelBMFont* m_login_prompt_1 = nullptr;
@@ -35,4 +36,5 @@ protected:
     LoadingCircle* m_save_loading_circle = nullptr;
 public:
     static EditPage* create(ProfileData const& profile_data);
+    void setCallback(std::function<void(ProfileData const&)> callback);
 };
