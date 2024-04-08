@@ -8,11 +8,6 @@
 	"description": "",
 	"dependencies": [
 		{
-			"id": "rooot.dashauth",
-			"version": "0.0.2",
-			"importance": "required"
-		},
-		{
 			"id": "geode.node-ids",
 			"version": "1.8.1",
 			"importance": "required"

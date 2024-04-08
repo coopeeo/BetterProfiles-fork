@@ -1,5 +1,5 @@
 #include <Geode/Geode.hpp>
-#include <rooot.dashauth/include/dashauth.hpp>
+#include <dashauth.hpp>
 
 #include "ui/edit_pronouns.hpp"
 #include "structs.hpp"
