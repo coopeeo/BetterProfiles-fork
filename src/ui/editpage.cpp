@@ -2,6 +2,7 @@
 
 #include "ui/editpage.hpp"
 #include "ui/edit_pronouns.hpp"
+#include "ui/edit_bio.hpp"
 #include <UIBuilder.hpp>
 
 using namespace geode::prelude;
@@ -97,7 +98,9 @@ void EditPage::setupLoggedIn() {
 
     // bio
     Build<ButtonSprite>::create("Change Bio", 80, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
-        .intoMenuItem([](auto) {})
+        .intoMenuItem([](auto) {
+            EditBioPopup::create(&(current_edit_page->m_profile_data))->show();
+        })
         .id("bio-button"_spr)
         .parent(main_menu);
 
