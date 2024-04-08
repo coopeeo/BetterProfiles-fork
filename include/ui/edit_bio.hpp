@@ -13,5 +13,5 @@ protected:
 public:
     static EditBioPopup* create(ProfileData* const& profile_data);
     virtual void onClose(cocos2d::CCObject*) override;
-    virtual void enterPressed(CCTextInputNode*) override; // this doesn't seem to get called :(
+    virtual void textChanged(CCTextInputNode*) override;
 };
