@@ -48,6 +48,15 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
     this->parsePronouns(profile_data->pronouns.value_or(""));
     this->updateUI();
 
+    Build<CCLabelBMFont>::create("if you want custom pronouns, send a GD message to rooot", "goldFont.fnt")
+        .id("custom-notice"_spr)
+        .scale(0.5f)
+        .pos(win_size.width / 2, 45.f)
+        .parent(m_mainLayer)
+        .intoNewSibling(CCLabelBMFont::create("(this is to prevent abuse)", "goldFont.fnt"))
+            .scale(0.5f)
+            .pos(win_size.width / 2, 35.f);
+
     return true;
 }
 
