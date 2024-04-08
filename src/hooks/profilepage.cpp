@@ -1,5 +1,6 @@
 #include <Geode/utils/web.hpp>
 #include <Geode/modify/ProfilePage.hpp>
+#include <UIBuilder.hpp>
 
 #include "structs.hpp"
 #include "ui/editpage.hpp"
@@ -26,13 +27,13 @@ class $modify(BetterProfilePage, ProfilePage) {
 
         auto pos = this->m_usernameLabel->getPosition();
 
-        log::info("creating pronoun label");
-        m_fields->m_pronoun_label = CCLabelBMFont::create("meow", "bigFont.fnt"); // "meow" is a placeholder
-        m_fields->m_pronoun_label->setPosition(pos.x, pos.y - 18.0f);
-        m_fields->m_pronoun_label->setScale(0.5f);
-        m_fields->m_pronoun_label->setID("pronoun-label"_spr);
-        m_fields->m_pronoun_label->setVisible(false);
-        this->m_mainLayer->addChild(m_fields->m_pronoun_label);
+        Build<CCLabelBMFont>::create("meow", "bigFont.fnt") // "meow" is a placeholder
+            .id("pronoun-label"_spr)
+            .pos(pos.x, pos.y - 18.0f)
+            .scale(0.5f)
+            .store(m_fields->m_pronoun_label)
+            .parent(this->m_mainLayer)
+            .visible(false);
 
         this->fetchProfileData(accountID);
 
@@ -44,14 +45,6 @@ class $modify(BetterProfilePage, ProfilePage) {
         ProfilePage::loadPageFromUserInfo(score);
 
         if (score->isCurrentUser()) {
-            // add edit button
-            auto edit_button = CCMenuItemSpriteExtra::create(
-                CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png"),
-                this,
-                menu_selector(BetterProfilePage::onEditButton)
-            );
-            edit_button->setID("edit-button"_spr);
-            
             auto left_menu = this->getChildByIDRecursive("left-menu");
             if (left_menu == nullptr) {
                 log::error("left_menu is null");
@@ -60,7 +53,12 @@ class $modify(BetterProfilePage, ProfilePage) {
 
             // prevent the button from deduplicating
             if (!left_menu->getChildByID("edit-button"_spr)) {
-                left_menu->addChild(edit_button);
+                Build<CCSprite>::createSpriteName("GJ_likeBtn_001.png")
+                    .intoMenuItem([this](auto) {
+                        this->onEditButton();
+                    })
+                        .id("edit-button"_spr)
+                        .parent(left_menu);
                 left_menu->updateLayout();
             }
         }
@@ -81,7 +79,7 @@ class $modify(BetterProfilePage, ProfilePage) {
 
     // -- non-hooks below --
 
-    void onEditButton(CCObject*) {
+    void onEditButton() {
         auto edit_page = EditPage::create(m_fields->m_profile_data);
         edit_page->setCallback([this](ProfileData const& profile_data) {
             this->m_fields->m_profile_data = profile_data;
