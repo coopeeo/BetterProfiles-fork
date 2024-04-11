@@ -1,6 +1,10 @@
 {
 	"geode": "2.0.0-beta.23",
-	"gd": "2.204",
+	"gd": {
+		"win": "2.204",
+		"android": "2.205",
+		"mac": "2.200"
+	},
 	"version": "v0.0.0",
 	"id": "rooot.betterprofiles",
 	"name": "BetterProfiles",
