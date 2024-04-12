@@ -9,7 +9,9 @@ using namespace geode::prelude;
 
 class $modify(BetterProfilePage, ProfilePage) {
     CCLabelBMFont* m_pronoun_label;
+    CCMenuItemSpriteExtra* m_profile_button;
     ProfileData m_profile_data;
+
     static inline BetterProfilePage* current_profile_page = nullptr;
 
     bool init(int accountID, bool ownProfile) {
@@ -40,9 +42,30 @@ class $modify(BetterProfilePage, ProfilePage) {
         return true;
     }
 
-    virtual void loadPageFromUserInfo(GJUserScore* score) {
+    void loadPageFromUserInfo(GJUserScore* score) {
         log::debug("loadPageFromUserInfo");
         ProfilePage::loadPageFromUserInfo(score);
+
+        if (!this->m_buttonMenu->getChildByID("profile-button"_spr)) {
+            auto gd_comment_button = this->m_buttonMenu->getChildByID("comment-history-button");
+            if (gd_comment_button != nullptr) {
+                log::info("moving comment button");
+                gd_comment_button->setPosition(gd_comment_button->getPosition() + ccp(0.f, -16.f));
+            } else {
+                log::warn("gd_comment_button is null");
+            }
+
+            Build<CCSprite>::createSpriteName("GJ_profileButton_001.png")
+                .scale(0.55f)
+                .intoMenuItem([this](auto) {
+                    log::info("profile button clicked");
+                })
+                    .id("profile-button"_spr)
+                    .visible(false)
+                    .store(this->m_fields->m_profile_button)
+                    .parent(this->m_buttonMenu)
+                    .pos(408.f, -118.f);
+        }
 
         if (score->isCurrentUser()) {
             auto left_menu = this->getChildByIDRecursive("left-menu");
