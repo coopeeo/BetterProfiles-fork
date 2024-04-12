@@ -4,6 +4,7 @@
 
 #include "structs.hpp"
 #include "ui/editpage.hpp"
+#include "ui/extended_profile.hpp"
 
 using namespace geode::prelude;
 
@@ -63,11 +64,12 @@ class $modify(BetterProfilePage, ProfilePage) {
                 .scale(0.55f)
                 .intoMenuItem([this](auto) {
                     log::info("profile button clicked");
-                    if (this->m_score->isCurrentUser()) {
+                    ExtendedProfilePage::create(&(m_fields->m_profile_data), m_score)->show();
+                    /*if (this->m_score->isCurrentUser()) {
                         this->onEditButton();
                     } else {
                         log::info("not current user");
-                    }
+                    }*/
                 })
                     .id("profile-button"_spr)
                     .visible(false)
