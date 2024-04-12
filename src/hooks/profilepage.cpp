@@ -79,6 +79,9 @@ class $modify(BetterProfilePage, ProfilePage) {
         }
         left_menu->updateLayout();
 
+        // show profile button for own user quickly
+        this->updateUIState();
+
         this->fetchProfileData(score->m_accountID);
     }
 
