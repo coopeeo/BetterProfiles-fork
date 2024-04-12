@@ -10,9 +10,18 @@ using namespace geode::prelude;
 class $modify(BetterProfilePage, ProfilePage) {
     CCLabelBMFont* m_pronoun_label;
     CCMenuItemSpriteExtra* m_profile_button;
+    CCSize m_profile_button_content_size;
     ProfileData m_profile_data;
+    bool m_data_loaded = false;
 
     static inline BetterProfilePage* current_profile_page = nullptr;
+
+    static void onModify(auto &self) {
+                                                                    // 1 below node ids
+        if (!self.setHookPriority("ProfilePage::loadPageFromUserInfo", 0x100000 - 1)) {
+            log::warn("failed to set hook priority, ui might look wacky");
+        }
+    }
 
     bool init(int accountID, bool ownProfile) {
         if (!ProfilePage::init(accountID, ownProfile)) {
@@ -36,9 +45,6 @@ class $modify(BetterProfilePage, ProfilePage) {
             .store(m_fields->m_pronoun_label)
             .parent(this->m_mainLayer)
             .visible(false);
-
-        this->fetchProfileData(accountID);
-
         return true;
     }
 
@@ -46,45 +52,34 @@ class $modify(BetterProfilePage, ProfilePage) {
         log::debug("loadPageFromUserInfo");
         ProfilePage::loadPageFromUserInfo(score);
 
-        if (!this->m_buttonMenu->getChildByID("profile-button"_spr)) {
-            auto gd_comment_button = this->m_buttonMenu->getChildByID("comment-history-button");
-            if (gd_comment_button != nullptr) {
-                log::info("moving comment button");
-                gd_comment_button->setPosition(gd_comment_button->getPosition() + ccp(0.f, -16.f));
-            } else {
-                log::warn("gd_comment_button is null");
-            }
+        auto left_menu = this->getChildByIDRecursive("left-menu");
+        if (left_menu == nullptr) {
+            log::error("left_menu is null");
+            return;
+        }
 
+        if (!this->m_fields->m_profile_button) {
             Build<CCSprite>::createSpriteName("GJ_profileButton_001.png")
                 .scale(0.55f)
                 .intoMenuItem([this](auto) {
                     log::info("profile button clicked");
+                    if (this->m_score->isCurrentUser()) {
+                        this->onEditButton();
+                    } else {
+                        log::info("not current user");
+                    }
                 })
                     .id("profile-button"_spr)
                     .visible(false)
                     .store(this->m_fields->m_profile_button)
-                    .parent(this->m_buttonMenu)
+                    .parent(left_menu)
                     .pos(408.f, -118.f);
+            this->m_fields->m_profile_button_content_size = this->m_fields->m_profile_button->getContentSize();
+            this->m_fields->m_profile_button->setContentSize({0.f, 0.f});
         }
+        left_menu->updateLayout();
 
-        if (score->isCurrentUser()) {
-            auto left_menu = this->getChildByIDRecursive("left-menu");
-            if (left_menu == nullptr) {
-                log::error("left_menu is null");
-                return;
-            }
-
-            // prevent the button from deduplicating
-            if (!left_menu->getChildByID("edit-button"_spr)) {
-                Build<CCSprite>::createSpriteName("GJ_likeBtn_001.png")
-                    .intoMenuItem([this](auto) {
-                        this->onEditButton();
-                    })
-                        .id("edit-button"_spr)
-                        .parent(left_menu);
-                left_menu->updateLayout();
-            }
-        }
+        this->fetchProfileData(score->m_accountID);
     }
 
     // prevent crashes
@@ -132,12 +127,14 @@ class $modify(BetterProfilePage, ProfilePage) {
                 // parse data and update UI
                 current_profile_page->m_fields->m_profile_data = response["data"].as<ProfileData>();
                 current_profile_page->m_fields->m_profile_data.id = account_id;
+                current_profile_page->m_fields->m_data_loaded = true;
                 current_profile_page->updateUIState();
         }).expect([account_id](std::string const& error) {
             log::error("failed to fetch profile data: {}", error);
             if (current_profile_page != nullptr) {
                 current_profile_page->m_fields->m_profile_data = ProfileData();
                 current_profile_page->m_fields->m_profile_data.id = account_id;
+                current_profile_page->m_fields->m_data_loaded = false;
                 current_profile_page->updateUIState();
             }
         });
@@ -146,6 +143,19 @@ class $modify(BetterProfilePage, ProfilePage) {
     // updates UI based on m_profile_data
     void updateUIState() {
         log::debug("updating ui");
+
+        if (this->m_fields->m_data_loaded || this->m_score->isCurrentUser()) {
+            log::debug("profile has data (or is self)");
+            if (this->m_fields->m_profile_button != nullptr) {
+                this->m_fields->m_profile_button->setVisible(true);
+                this->m_fields->m_profile_button->setContentSize(this->m_fields->m_profile_button_content_size);
+                if (auto left_menu = this->getChildByIDRecursive("left-menu")) {
+                    left_menu->updateLayout();
+                }
+            } else {
+                log::error("wtf! m_profile_button is null!");
+            }
+        }
 
         if (this->m_fields->m_profile_data.pronouns.has_value()) {
             log::debug("pronouns: {}", this->m_fields->m_profile_data.pronouns.value());
