@@ -3,7 +3,6 @@
 #include <UIBuilder.hpp>
 
 #include "structs.hpp"
-#include "ui/editpage.hpp"
 #include "ui/extended_profile.hpp"
 #include "state.hpp"
 
@@ -63,12 +62,14 @@ class $modify(BetterProfilePage, ProfilePage) {
                 .scale(0.55f)
                 .intoMenuItem([this](auto) {
                     log::info("profile button clicked");
-                    ExtendedProfilePage::create(&(m_fields->m_profile_data), m_score)->show();
-                    /*if (this->m_score->isCurrentUser()) {
-                        this->onEditButton();
-                    } else {
-                        log::info("not current user");
-                    }*/
+                    auto epp = ExtendedProfilePage::create(&(m_fields->m_profile_data), m_score);
+                    if (this->m_score->isCurrentUser()) {
+                        epp->setCallback([this](ProfileData const& profile_data) {
+                            this->m_fields->m_profile_data = profile_data;
+                            this->updateUIState();
+                        });
+                    }
+                    epp->show();
                 })
                     .id("profile-button"_spr)
                     .visible(false)
@@ -100,15 +101,6 @@ class $modify(BetterProfilePage, ProfilePage) {
     }
 
     // -- non-hooks below --
-
-    void onEditButton() {
-        auto edit_page = EditPage::create(m_fields->m_profile_data);
-        edit_page->setCallback([this](ProfileData const& profile_data) {
-            this->m_fields->m_profile_data = profile_data;
-            this->updateUIState();
-        });
-        edit_page->show();
-    }
 
     void fetchProfileData(int account_id, bool force = false) {
         auto state = State::sharedInstance();

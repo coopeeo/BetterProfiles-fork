@@ -1,7 +1,7 @@
 #include <Geode/Geode.hpp>
 
 #include "ui/extended_profile.hpp"
-//#include <UIBuilder.hpp>
+#include <UIBuilder.hpp>
 
 using namespace geode::prelude;
 
@@ -72,5 +72,32 @@ bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* c
 
     this->m_mainLayer->addChild(spider);
 
+    // create menu
+    auto menu = CCMenu::create();
+    menu->setPosition(win_size / 2);
+    this->m_mainLayer->addChild(menu);
+    
+    // add edit button if this is the current user
+    Build<CCSprite>::createSpriteName("GJ_profileButton_001.png")
+        .scale(0.55f)
+        .intoMenuItem([this](auto) {
+                log::info("edit button clicked");
+                auto edit_page = EditPage::create(*this->m_profile_data);
+                edit_page->setCallback(this->m_callback);
+                edit_page->show();
+            })
+            .id("edit-button"_spr)
+            .visible(false)
+            .store(this->m_edit_button)
+            .parent(menu)
+            /*.pos(408.f, -118.f)*/;
+
     return true;
+}
+
+void ExtendedProfilePage::setCallback(std::function<void(ProfileData const&)> callback) {
+    this->m_callback = callback;
+    if (this->m_edit_button) {
+        this->m_edit_button->setVisible(true);
+    }
 }
