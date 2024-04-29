@@ -2,6 +2,7 @@
 #include <Geode/modify/ProfilePage.hpp>
 #include <UIBuilder.hpp>
 
+#include "backend.hpp"
 #include "structs.hpp"
 #include "ui/extended_profile.hpp"
 #include "state.hpp"
@@ -114,7 +115,7 @@ class $modify(BetterProfilePage, ProfilePage) {
         }
 
         web::AsyncWebRequest()
-            .fetch(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", account_id))
+            .fetch(fmt::format("{}/api/v1/profiles/{}", BACKEND_PREFIX, account_id))
             .json()
             .then([account_id](matjson::Value const& response) {
                 if (!response["success"].as_bool()) {

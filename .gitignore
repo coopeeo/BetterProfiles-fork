@@ -56,3 +56,6 @@ build-*/
 
 # Visual Studio
 .vs/
+
+# ignore custom endpoints.hpp
+/endpoints.hpp

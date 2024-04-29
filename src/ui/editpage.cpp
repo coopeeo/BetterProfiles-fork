@@ -1,5 +1,6 @@
 #include <Geode/Geode.hpp>
 
+#include "backend.hpp"
 #include "ui/editpage.hpp"
 #include "ui/edit_pronouns.hpp"
 #include "ui/edit_bio.hpp"
@@ -146,7 +147,7 @@ void EditPage::onLogin() {
         .store(m_login_loading_circle);
     m_login_loading_circle->show();
 
-    dashauth::DashAuthRequest().getToken(Mod::get(), "https://gd-backend.foxgirl.wtf/api/v1")->except([](std::string const& error) {
+    dashauth::DashAuthRequest().getToken(Mod::get(), fmt::format("{}/api/v1", BACKEND_PREFIX))->except([](std::string const& error) {
         log::info("login failed: {}", error);
 
         // make sure that we can fuck with the ui
@@ -207,7 +208,7 @@ void EditPage::onSave() {
     geode::utils::web::AsyncWebRequest()
         .body(this->m_profile_data)
         .header(fmt::format("Authorization: Bearer {}", Mod::get()->getSavedValue<std::string>("token", "")))
-        .post(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", this->m_profile_data.id))
+        .post(fmt::format("{}/api/v1/profiles/{}", BACKEND_PREFIX, this->m_profile_data.id))
         .json()
         .then([](matjson::Value const& response) {
             log::info("saved profile data !!");
