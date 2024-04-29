@@ -10,7 +10,7 @@
 using namespace geode::prelude;
 
 class $modify(BetterProfilePage, ProfilePage) {
-    CCLabelBMFont* m_pronoun_label;
+    CCLabelBMFont* m_pronoun_label = nullptr;
     CCMenuItemSpriteExtra* m_profile_button;
     CCSize m_profile_button_content_size;
     ProfileData m_profile_data;
@@ -44,13 +44,16 @@ class $modify(BetterProfilePage, ProfilePage) {
 
         auto pos = this->m_usernameLabel->getPosition();
 
-        Build<CCLabelBMFont>::create("meow", "bigFont.fnt") // "meow" is a placeholder
-            .id("pronoun-label"_spr)
-            .pos(pos.x, pos.y - 18.0f)
-            .scale(0.5f)
-            .store(m_fields->m_pronoun_label)
-            .parent(this->m_mainLayer)
-            .visible(false);
+        if (!this->m_fields->m_pronoun_label) {
+            log::debug("creating pronoun label");
+            Build<CCLabelBMFont>::create("meow", "bigFont.fnt") // "meow" is a placeholder
+                .id("pronoun-label"_spr)
+                .pos(pos.x, pos.y - 18.0f)
+                .scale(0.5f)
+                .store(m_fields->m_pronoun_label)
+                .parent(this->m_mainLayer)
+                .visible(false);
+        }
 
         auto left_menu = this->getChildByIDRecursive("left-menu");
         if (left_menu == nullptr) {
