@@ -18,13 +18,6 @@ class $modify(BetterProfilePage, ProfilePage) {
 
     static inline BetterProfilePage* current_profile_page = nullptr;
 
-    static void onModify(auto &self) {
-                                                                    // 1 below node ids
-        if (!self.setHookPriority("ProfilePage::loadPageFromUserInfo", 0x100000 - 1)) {
-            log::warn("failed to set hook priority, ui might look wacky");
-        }
-    }
-
     bool init(int accountID, bool ownProfile) {
         if (!ProfilePage::init(accountID, ownProfile)) {
             return false;
@@ -186,6 +179,14 @@ class $modify(BetterProfilePage, ProfilePage) {
             
             this->m_fields->m_pronoun_label->setString(this->m_fields->m_profile_data.pronouns.value().c_str());
             this->m_fields->m_pronoun_label->setVisible(true);
+        }
+
+        if (Loader::get()->isModLoaded("bitz.customprofiles")) {
+            log::debug("customprofiles loaded, doing extra support");
+            if (auto custom_gradient = this->getChildByIDRecursive("bitz.customprofiles/normal-gradient")) {
+                // todo !!
+                custom_gradient->setVisible(false);
+            }
         }
     }
 };

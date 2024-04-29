@@ -16,5 +16,12 @@
 			"version": "1.8.1",
 			"importance": "required"
 		}
+	],
+	"incompatibilities": [
+		{
+			"id": "bitz.customprofiles",
+			"importance": "breaking",
+			"version": "<1.0.8"
+		}
 	]
 }
