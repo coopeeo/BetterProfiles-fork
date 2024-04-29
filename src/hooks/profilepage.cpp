@@ -5,6 +5,7 @@
 #include "structs.hpp"
 #include "ui/editpage.hpp"
 #include "ui/extended_profile.hpp"
+#include "state.hpp"
 
 using namespace geode::prelude;
 
@@ -29,12 +30,23 @@ class $modify(BetterProfilePage, ProfilePage) {
             return false;
         }
         log::info("init profilepage");
-
         current_profile_page = this;
+
+        // important:
+        // don't actually init any UI here
+        // sometimes this function gets called *after*
+        // loadPageFromUserInfo, which is where the UI is used
+
+        return true;
+    }
+
+    void loadPageFromUserInfo(GJUserScore* score) {
+        log::debug("loadPageFromUserInfo");
+        ProfilePage::loadPageFromUserInfo(score);
 
         if (this->m_usernameLabel == nullptr) {
             log::error("m_usernameLabel is null");
-            return true;
+            return;
         }
 
         auto pos = this->m_usernameLabel->getPosition();
@@ -46,12 +58,6 @@ class $modify(BetterProfilePage, ProfilePage) {
             .store(m_fields->m_pronoun_label)
             .parent(this->m_mainLayer)
             .visible(false);
-        return true;
-    }
-
-    void loadPageFromUserInfo(GJUserScore* score) {
-        log::debug("loadPageFromUserInfo");
-        ProfilePage::loadPageFromUserInfo(score);
 
         auto left_menu = this->getChildByIDRecursive("left-menu");
         if (left_menu == nullptr) {
@@ -96,7 +102,7 @@ class $modify(BetterProfilePage, ProfilePage) {
 
     void onUpdate(cocos2d::CCObject* sender) {
         ProfilePage::onUpdate(sender);
-        this->fetchProfileData(this->m_accountID);
+        this->fetchProfileData(this->m_accountID, true);
         log::info("onUpdate");
     }
 
@@ -111,7 +117,17 @@ class $modify(BetterProfilePage, ProfilePage) {
         edit_page->show();
     }
 
-    void fetchProfileData(int account_id) {
+    void fetchProfileData(int account_id, bool force = false) {
+        auto state = State::sharedInstance();
+
+        if (state->profiles.contains(account_id) && !force) {
+            log::info("using cached profile data");
+            this->m_fields->m_profile_data = state->profiles[account_id];
+            this->m_fields->m_data_loaded = true;
+            this->updateUIState();
+            return;
+        }
+
         web::AsyncWebRequest()
             .fetch(fmt::format("https://gd-backend.foxgirl.wtf/api/v1/profiles/{}", account_id))
             .json()
@@ -130,9 +146,12 @@ class $modify(BetterProfilePage, ProfilePage) {
                 log::info("fetched profile data");
 
                 // parse data and update UI
-                current_profile_page->m_fields->m_profile_data = response["data"].as<ProfileData>();
+                auto profile_data = response["data"].as<ProfileData>();
+                current_profile_page->m_fields->m_profile_data = profile_data;
                 current_profile_page->m_fields->m_profile_data.id = account_id;
                 current_profile_page->m_fields->m_data_loaded = true;
+
+                State::sharedInstance()->profiles[account_id] = profile_data;
                 current_profile_page->updateUIState();
         }).expect([account_id](std::string const& error) {
             log::error("failed to fetch profile data: {}", error);
