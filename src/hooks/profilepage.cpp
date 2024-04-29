@@ -179,9 +179,23 @@ class $modify(BetterProfilePage, ProfilePage) {
 
         if (Loader::get()->isModLoaded("bitz.customprofiles")) {
             log::debug("customprofiles loaded, doing extra support");
-            if (auto custom_gradient = this->getChildByIDRecursive("bitz.customprofiles/normal-gradient")) {
-                // todo !!
-                custom_gradient->setVisible(false);
+            if (auto custom_gradient = typeinfo_cast<CCLayerGradient*>(this->getChildByIDRecursive("bitz.customprofiles/normal-gradient"))) {
+                log::debug("found custom gradient");
+                if (this->m_fields->m_profile_data.color1.has_value()) {
+                    log::debug("setting custom gradient color 1");
+                    int r = this->m_fields->m_profile_data.color1.value() >> 16 & 0xFF;
+                    int g = this->m_fields->m_profile_data.color1.value() >> 8 & 0xFF;
+                    int b = this->m_fields->m_profile_data.color1.value() & 0xFF;
+                    custom_gradient->setStartColor(ccc3(r, g, b));
+                }
+
+                if (this->m_fields->m_profile_data.color2.has_value()) {
+                    log::debug("setting custom gradient color 2");
+                    int r = this->m_fields->m_profile_data.color2.value() >> 16 & 0xFF;
+                    int g = this->m_fields->m_profile_data.color2.value() >> 8 & 0xFF;
+                    int b = this->m_fields->m_profile_data.color2.value() & 0xFF;
+                    custom_gradient->setEndColor(ccc3(r, g, b));
+                }
             }
         }
     }

@@ -16,6 +16,10 @@ struct ProfileData {
     std::optional<std::string> social_myspace;
     std::optional<std::string> social_facebook;
 
+    // custom gradient colors
+    std::optional<int> color1;
+    std::optional<int> color2;
+
     auto operator<=>(const ProfileData&) const = default;
 };
 
@@ -36,6 +40,8 @@ struct matjson::Serialize<ProfileData> {
             .social_tumblr = value.try_get<std::string>("social_tumblr"),
             .social_myspace = value.try_get<std::string>("social_myspace"),
             .social_facebook = value.try_get<std::string>("social_facebook"),
+            .color1 = value.try_get<int>("color1"),
+            .color2 = value.try_get<int>("color2"),
         };
     }
     static matjson::Value to_json(const ProfileData& profile_data) {
@@ -53,6 +59,8 @@ struct matjson::Serialize<ProfileData> {
             { "social_tumblr", profile_data.social_tumblr.value_or("") },
             { "social_myspace", profile_data.social_myspace.value_or("") },
             { "social_facebook", profile_data.social_facebook.value_or("") },
+            { "color1", profile_data.color1.value_or(0) },
+            { "color2", profile_data.color2.value_or(0) },
         };
         // for some reason .value_or(nullptr) crashes, work around this by setting the value null after the fact
         if (!profile_data.bio.has_value()) res["bio"] = nullptr;
@@ -66,6 +74,8 @@ struct matjson::Serialize<ProfileData> {
         if (!profile_data.social_tumblr.has_value()) res["social_tumblr"] = nullptr;
         if (!profile_data.social_myspace.has_value()) res["social_myspace"] = nullptr;
         if (!profile_data.social_facebook.has_value()) res["social_facebook"] = nullptr;
+        if (!profile_data.color1.has_value()) res["color1"] = nullptr;
+        if (!profile_data.color2.has_value()) res["color2"] = nullptr;
         return res;
     }
 };
