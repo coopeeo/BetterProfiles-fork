@@ -231,6 +231,9 @@ void EditPage::onSave() {
             current_edit_page->removeFromParent();
         }).expect([](std::string const& error) {
             log::info("failed to save profile data: {}", error);
+            auto json = matjson::parse(error);
+
+            FLAlertLayer::create("Failed to save profile", fmt::format("{}", json.contains("message") ? json["message"].as_string() : "wtf"), "OK")->show();
             if (current_edit_page == nullptr) return;
             current_edit_page->m_save_loading_circle->fadeAndRemove();
             current_edit_page->m_save_loading_circle->removeFromParent();
