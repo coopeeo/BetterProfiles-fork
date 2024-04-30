@@ -80,21 +80,20 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
     auto menu = CCMenu::create();
     menu->setPosition(win_size / 2);
     this->m_mainLayer->addChild(menu);
-    
-    // add edit button if this is the current user
-    Build<CCSprite>::createSpriteName("GJ_profileButton_001.png")
-        .scale(0.55f)
+
+    Build<geode::CircleButtonSprite>::create(CCSprite::createWithSpriteFrameName("geode.loader/pencil.png"), CircleBaseColor::Green, CircleBaseSize::MediumAlt)
+        .scale(0.65f)
         .intoMenuItem([this](auto) {
-                log::info("edit button clicked");
-                auto edit_page = EditPage::create(this->m_profile_data);
-                edit_page->setCallback(this->m_callback);
-                edit_page->show();
-            })
+            log::info("edit button clicked");
+            auto edit_page = EditPage::create(this->m_profile_data);
+            edit_page->setCallback(this->m_callback);
+            edit_page->show();
+        })
             .id("edit-button"_spr)
             .visible(false)
             .store(this->m_edit_button)
             .parent(menu)
-            /*.pos(408.f, -118.f)*/;
+            .pos((popup_content_size / 2) - 24.f);
 
     this->updateUI();
 
