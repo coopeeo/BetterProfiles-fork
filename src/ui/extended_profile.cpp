@@ -35,16 +35,17 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
         popup_content_size = bg_sprite->getContentSize();
         bg_sprite->setVisible(false);
 
-        this->m_background = CCLayerGradient::create({col1.r, col1.g, col1.b, 255}, ccc4(col2.r, col2.g, col2.b, 255));
-        this->m_background->setContentSize(popup_content_size - ccp(5.f, 5.f));
-        this->m_background->ignoreAnchorPointForPosition(false);
-        this->m_background->setPosition(win_size / 2);
-        this->m_mainLayer->addChild(this->m_background, -1);
+        Build<CCLayerGradient>::create(ccc4(col1.r, col1.g, col1.b, 255), ccc4(col2.r, col2.g, col2.b, 255))
+            .contentSize(popup_content_size - ccp(5.f, 5.f))
+            .ignoreAnchorPointForPos(false)
+            .pos(win_size / 2)
+            .parent(this->m_mainLayer)
+            .store(this->m_background);
 
-        auto popup_frame = CCScale9Sprite::create("GJ_square07.png");
-        popup_frame->setContentSize(popup_content_size);
-        popup_frame->setPosition(win_size / 2);
-        this->m_mainLayer->addChild(popup_frame, 1);
+        Build<CCScale9Sprite>::create("GJ_square07.png")
+            .contentSize(popup_content_size)
+            .pos(win_size / 2)
+            .parent(this->m_mainLayer);
 
         // when we're done with bg_sprite, nuke it
         bg_sprite->removeFromParentAndCleanup(true);
@@ -52,34 +53,36 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
         log::error("background is null");
     }
 
-    auto darkener = CCScale9Sprite::create("square02b_001.png");
-    darkener->setContentSize(popup_content_size - ccp(15.f, 15.f));
-    darkener->setPosition(win_size / 2);
-    darkener->setColor(ccc3(0, 0, 0));
-    darkener->setOpacity(50);
-    this->m_mainLayer->addChild(darkener, 0);
+    Build<CCScale9Sprite>::create("square02b_001.png")
+        .contentSize(popup_content_size - ccp(15.f, 15.f))
+        .pos(win_size / 2)
+        .color(ccc3(0, 0, 0))
+        .opacity(50)
+        .parent(this->m_mainLayer);
 
-    this->m_bio_area = MDTextArea::create("", {280.f, 150.f});
-    this->m_bio_area->setPosition(win_size / 2);
-    this->m_mainLayer->addChild(this->m_bio_area);
+    Build<MDTextArea>::create("", ccp(280.f, 150.f))
+        .pos(win_size / 2)
+        .store(this->m_bio_area)
+        .parent(this->m_mainLayer);
 
     this->setTitle(fmt::format("{}'s Profile", user_score->m_userName));
 
-    auto spider = SimplePlayer::create(0);
-    spider->updatePlayerFrame(user_score->m_playerSpider, IconType::Spider);
-    spider->setColor(player_col1);
-    spider->setSecondColor(player_col2);
+    auto spider = Build<SimplePlayer>::create(0)
+        .playerFrame(user_score->m_playerSpider, IconType::Spider)
+        .color(player_col1)
+        .secondColor(player_col2)
+        .pos({win_size.width / 4 + 32.f, 32.f})
+        .parent(this->m_mainLayer)
+        .collect();
+
     if (user_score->m_glowEnabled) {
         spider->setGlowOutline(game_manager->colorForIdx(user_score->m_color3));
     }
-    spider->setPosition({win_size.width / 4 + 32.f, 32.f});
 
-    this->m_mainLayer->addChild(spider);
-
-    // create menu
-    auto menu = CCMenu::create();
-    menu->setPosition(win_size / 2);
-    this->m_mainLayer->addChild(menu);
+    auto menu = Build<CCMenu>::create()
+        .pos(win_size / 2)
+        .parent(this->m_mainLayer)
+        .collect();
 
     Build<geode::CircleButtonSprite>::create(CCSprite::createWithSpriteFrameName("geode.loader/pencil.png"), CircleBaseColor::Green, CircleBaseSize::MediumAlt)
         .scale(0.65f)

@@ -37,13 +37,11 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
         .layout(RowLayout::create()->setGap(18.f))
         .pos(win_size / 2)
         .parent(m_mainLayer)
+        .child(this->createPronounSet(1))
+        .child(this->createPronounSet(2))
+        .child(this->createPronounSet(3))
+        .updateLayout()
         .store(m_pronoun_sets_menu);
-
-    // idk how to UIBuilder-ify these
-    m_pronoun_sets_menu->addChild(this->createPronounSet(1));
-    m_pronoun_sets_menu->addChild(this->createPronounSet(2));
-    m_pronoun_sets_menu->addChild(this->createPronounSet(3));
-    m_pronoun_sets_menu->updateLayout();
 
     this->parsePronouns(profile_data->pronouns.value_or(""));
     this->updateUI();
@@ -165,12 +163,11 @@ void EditPronounsPopup::updateUI() {
 }
 
 CCMenu* EditPronounsPopup::createPronounSet(int set) {
-    auto menu = CCMenu::create();
-    menu->setPosition(0.f, 0.f);
-    menu->setLayout(ColumnLayout::create());
-
-    menu->setTag(set);
-    menu->setID(fmt::format("set-{}", set));
+    auto menu = Build<CCMenu>::create()
+        .layout(ColumnLayout::create())
+        .tag(set)
+        .id(fmt::format("set-{}", set))
+        .collect();
 
     Build<ButtonSprite>::create("they/them", 40, true, "bigFont.fnt", TEXTURE_BUTTON_ENABLED, 32.0f, 1.0f)
         .intoMenuItem([this, set](auto) {

@@ -33,16 +33,17 @@ bool EditBackgroundPopup::setup(ProfileData* const& profile_data) {
         auto col1 = Utils::intToColor(profile_data->color1.value_or(0));
         auto col2 = Utils::intToColor(profile_data->color2.value_or(0));
 
-        this->m_background = CCLayerGradient::create({col1.r, col1.g, col1.b, 255}, ccc4(col2.r, col2.g, col2.b, 255));
-        this->m_background->setContentSize(popup_content_size - ccp(5.f, 5.f));
-        this->m_background->ignoreAnchorPointForPosition(false);
-        this->m_background->setPosition(win_size / 2);
-        this->m_mainLayer->addChild(this->m_background, -1);
+        Build<CCLayerGradient>::create(ccc4(col1.r, col1.g, col1.b, 255), ccc4(col2.r, col2.g, col2.b, 255))
+            .contentSize(popup_content_size - ccp(5.f, 5.f))
+            .ignoreAnchorPointForPos(false)
+            .pos(win_size / 2)
+            .parent(this->m_mainLayer)
+            .store(this->m_background);
 
-        auto popup_frame = CCScale9Sprite::create("GJ_square07.png");
-        popup_frame->setContentSize(popup_content_size);
-        popup_frame->setPosition(win_size / 2);
-        this->m_mainLayer->addChild(popup_frame, 1);
+        Build<CCScale9Sprite>::create("GJ_square07.png")
+            .contentSize(popup_content_size)
+            .pos(win_size / 2)
+            .parent(this->m_mainLayer);
 
         // when we're done with bg_sprite, nuke it
         bg_sprite->removeFromParentAndCleanup(true);
@@ -50,12 +51,12 @@ bool EditBackgroundPopup::setup(ProfileData* const& profile_data) {
         log::error("background is null");
     }
 
-    auto darkener = CCScale9Sprite::create("square02b_001.png");
-    darkener->setContentSize(popup_content_size - ccp(15.f, 15.f));
-    darkener->setPosition(win_size / 2);
-    darkener->setColor(ccc3(0, 0, 0));
-    darkener->setOpacity(50);
-    this->m_mainLayer->addChild(darkener, 0);
+    Build<CCScale9Sprite>::create("square02b_001.png")
+        .contentSize(popup_content_size - ccp(15.f, 15.f))
+        .pos(win_size / 2)
+        .color(ccc3(0, 0, 0))
+        .opacity(50)
+        .parent(this->m_mainLayer);
     // end copy paste meow
 
     auto main_menu = CCMenu::create();
