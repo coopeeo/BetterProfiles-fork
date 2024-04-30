@@ -66,7 +66,7 @@ class $modify(BetterProfilePage, ProfilePage) {
                 .scale(0.55f)
                 .intoMenuItem([this](auto) {
                     log::info("profile button clicked");
-                    auto epp = ExtendedProfilePage::create(&(m_fields->m_profile_data), m_score);
+                    auto epp = ExtendedProfilePage::create(m_fields->m_profile_data, m_score);
                     if (this->m_score->isCurrentUser()) {
                         epp->setCallback([this](ProfileData &profile_data) {
                             this->m_fields->m_profile_data = profile_data;

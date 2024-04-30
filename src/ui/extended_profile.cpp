@@ -6,7 +6,7 @@
 
 using namespace geode::prelude;
 
-ExtendedProfilePage* ExtendedProfilePage::create(ProfileData* const& profile_data, GJUserScore* const& user_score) {
+ExtendedProfilePage* ExtendedProfilePage::create(ProfileData const& profile_data, GJUserScore* const& user_score) {
     auto ret = new ExtendedProfilePage();
     ret->m_profile_data = profile_data;
     ret->m_user_score = user_score;
@@ -18,15 +18,15 @@ ExtendedProfilePage* ExtendedProfilePage::create(ProfileData* const& profile_dat
     return nullptr;
 }
 
-bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* const& user_score) {
+bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* const& user_score) {
     auto win_size = CCDirector::sharedDirector()->getWinSize();
     auto game_manager = GameManager::sharedState();
 
     auto player_col1 = game_manager->colorForIdx(user_score->m_color1);
     auto player_col2 = game_manager->colorForIdx(user_score->m_color2);
 
-    auto col1 = profile_data->color1.has_value() ? Utils::intToColor(profile_data->color1.value_or(0)) : player_col1;
-    auto col2 = profile_data->color2.has_value() ? Utils::intToColor(profile_data->color2.value_or(0)) : player_col2;
+    auto col1 = profile_data.color1.has_value() ? Utils::intToColor(profile_data.color1.value_or(0)) : player_col1;
+    auto col2 = profile_data.color2.has_value() ? Utils::intToColor(profile_data.color2.value_or(0)) : player_col2;
 
     auto bg_sprite = getChildOfType<CCScale9Sprite>(this->m_mainLayer, 0);
 
@@ -86,7 +86,7 @@ bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* c
         .scale(0.55f)
         .intoMenuItem([this](auto) {
                 log::info("edit button clicked");
-                auto edit_page = EditPage::create(*this->m_profile_data);
+                auto edit_page = EditPage::create(this->m_profile_data);
                 edit_page->setCallback(this->m_callback);
                 edit_page->show();
             })
@@ -105,17 +105,17 @@ void ExtendedProfilePage::updateUI() {
     auto player_col1 = GameManager::sharedState()->colorForIdx(this->m_user_score->m_color1);
     auto player_col2 = GameManager::sharedState()->colorForIdx(this->m_user_score->m_color2);
 
-    auto col1 = this->m_profile_data->color1.has_value() ? Utils::intToColor(this->m_profile_data->color1.value_or(0)) : player_col1;
-    auto col2 = this->m_profile_data->color2.has_value() ? Utils::intToColor(this->m_profile_data->color2.value_or(0)) : player_col2;
+    auto col1 = this->m_profile_data.color1.has_value() ? Utils::intToColor(this->m_profile_data.color1.value_or(0)) : player_col1;
+    auto col2 = this->m_profile_data.color2.has_value() ? Utils::intToColor(this->m_profile_data.color2.value_or(0)) : player_col2;
     this->m_background->setStartColor(col1);
     this->m_background->setEndColor(col2);
 
-    this->m_bio_area->setString(this->m_profile_data->bio.value_or("this player <cr>doesn't</c> have a bio set!").c_str());
+    this->m_bio_area->setString(this->m_profile_data.bio.value_or("this player <cr>doesn't</c> have a bio set!").c_str());
 }
 
 void ExtendedProfilePage::setCallback(std::function<void(ProfileData &)> callback) {
     this->m_callback = [this, callback](ProfileData &data) {
-        this->m_profile_data = &data;
+        this->m_profile_data = data;
         this->updateUI();
         callback(data);
     };

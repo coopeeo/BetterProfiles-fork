@@ -5,14 +5,14 @@
 #include "ui/edit_pronouns.hpp"
 #include "structs.hpp"
 
-class ExtendedProfilePage : public geode::Popup<ProfileData* const&, GJUserScore* const&> {
+class ExtendedProfilePage : public geode::Popup<ProfileData const&, GJUserScore* const&> {
 protected:
-    bool setup(ProfileData* const& profile_data, GJUserScore* const& user_score) override;
+    bool setup(ProfileData const& profile_data, GJUserScore* const& user_score) override;
 
     void updateUI();
 
     // members
-    ProfileData* m_profile_data;
+    ProfileData m_profile_data;
     GJUserScore* m_user_score;
     std::function<void(ProfileData &)> m_callback = nullptr;
 
@@ -21,6 +21,6 @@ protected:
     CCLayerGradient* m_background;
     MDTextArea* m_bio_area;
 public:
-    static ExtendedProfilePage* create(ProfileData* const& profile_data, GJUserScore* const& user_score);
+    static ExtendedProfilePage* create(ProfileData const& profile_data, GJUserScore* const& user_score);
     void setCallback(std::function<void(ProfileData &)> callback);
 };
