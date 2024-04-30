@@ -206,11 +206,13 @@ void EditPage::onSave() {
     log::info("saving profile data");
 
     // loading circle !!
-    Build<LoadingCircle>::create()
-        .pos(0.f, 0.f)
-        .id("loading_circle"_spr)
-        .parent(m_mainLayer)
-        .store(m_save_loading_circle);
+    if (!this->m_save_loading_circle) {
+        Build<LoadingCircle>::create()
+            .pos(0.f, 0.f)
+            .id("loading_circle"_spr)
+            .parent(m_mainLayer)
+            .store(m_save_loading_circle);
+    }
     m_save_loading_circle->show();
 
     // save the profile data
