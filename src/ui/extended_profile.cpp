@@ -10,6 +10,7 @@ ExtendedProfilePage* ExtendedProfilePage::create(ProfileData const& profile_data
     auto ret = new ExtendedProfilePage();
     ret->m_profile_data = profile_data;
     ret->m_user_score = user_score;
+    if (profile_data.id == 0) ret->m_profile_data.id = user_score->m_accountID;
     if (ret && ret->init(441.f, 292.f, profile_data, user_score)) {
         ret->autorelease();
         return ret;
