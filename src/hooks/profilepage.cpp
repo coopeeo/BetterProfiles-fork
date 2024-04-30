@@ -70,6 +70,7 @@ class $modify(BetterProfilePage, ProfilePage) {
                     if (this->m_score->isCurrentUser()) {
                         epp->setCallback([this](ProfileData &profile_data) {
                             this->m_fields->m_profile_data = profile_data;
+                            State::sharedInstance()->profiles[this->m_accountID] = profile_data;
                             this->updateUIState();
                         });
                     }
