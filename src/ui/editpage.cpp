@@ -206,13 +206,18 @@ void EditPage::onSave() {
     log::info("saving profile data");
 
     // loading circle !!
-    if (!this->m_save_loading_circle) {
-        Build<LoadingCircle>::create()
-            .pos(0.f, 0.f)
-            .id("loading_circle"_spr)
-            .parent(m_mainLayer)
-            .store(m_save_loading_circle);
+    if (this->m_save_loading_circle) {
+        m_save_loading_circle->fadeAndRemove();
+        m_save_loading_circle->removeFromParentAndCleanup(true);
+        m_save_loading_circle = nullptr;
     }
+
+    Build<LoadingCircle>::create()
+        .pos(0.f, 0.f)
+        .id("loading_circle"_spr)
+        .parent(m_mainLayer)
+        .store(m_save_loading_circle);
+
     m_save_loading_circle->show();
 
     // save the profile data
@@ -228,7 +233,7 @@ void EditPage::onSave() {
             if(current_edit_page->m_callback != nullptr) current_edit_page->m_callback(current_edit_page->m_profile_data);
             current_edit_page->m_original_data = current_edit_page->m_profile_data;
             current_edit_page->m_save_loading_circle->fadeAndRemove();
-            current_edit_page->m_save_loading_circle->removeFromParent();
+            current_edit_page->m_save_loading_circle->removeFromParentAndCleanup(true);
             current_edit_page->m_save_loading_circle = nullptr;
             current_edit_page->removeFromParent();
         }).expect([](std::string const& error) {
@@ -238,7 +243,7 @@ void EditPage::onSave() {
             FLAlertLayer::create("Failed to save profile", fmt::format("{}", json.contains("message") ? json["message"].as_string() : "wtf"), "OK")->show();
             if (current_edit_page == nullptr) return;
             current_edit_page->m_save_loading_circle->fadeAndRemove();
-            current_edit_page->m_save_loading_circle->removeFromParent();
+            current_edit_page->m_save_loading_circle->removeFromParentAndCleanup(true);
             current_edit_page->m_save_loading_circle = nullptr;
         });
 }
