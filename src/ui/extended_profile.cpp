@@ -8,9 +8,9 @@ using namespace geode::prelude;
 
 ExtendedProfilePage* ExtendedProfilePage::create(ProfileData* const& profile_data, GJUserScore* const& user_score) {
     auto ret = new ExtendedProfilePage();
+    ret->m_profile_data = profile_data;
+    ret->m_user_score = user_score;
     if (ret && ret->init(441.f, 292.f, profile_data, user_score)) {
-        ret->m_profile_data = profile_data;
-        ret->m_user_score = user_score;
         ret->autorelease();
         return ret;
     }
@@ -59,9 +59,9 @@ bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* c
     darkener->setOpacity(50);
     this->m_mainLayer->addChild(darkener, 0);
 
-    auto bio = MDTextArea::create(profile_data->bio.value_or("this player <cr>doesn't</c> have a bio set!"), {280.f, 150.f});
-    bio->setPosition(win_size / 2);
-    this->m_mainLayer->addChild(bio);
+    this->m_bio_area = MDTextArea::create("", {280.f, 150.f});
+    this->m_bio_area->setPosition(win_size / 2);
+    this->m_mainLayer->addChild(this->m_bio_area);
 
     this->setTitle(fmt::format("{}'s Profile", user_score->m_userName));
 
@@ -96,6 +96,8 @@ bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* c
             .parent(menu)
             /*.pos(408.f, -118.f)*/;
 
+    this->updateUI();
+
     return true;
 }
 
@@ -107,6 +109,8 @@ void ExtendedProfilePage::updateUI() {
     auto col2 = this->m_profile_data->color2.has_value() ? Utils::intToColor(this->m_profile_data->color2.value_or(0)) : player_col2;
     this->m_background->setStartColor(col1);
     this->m_background->setEndColor(col2);
+
+    this->m_bio_area->setString(this->m_profile_data->bio.value_or("this player <cr>doesn't</c> have a bio set!").c_str());
 }
 
 void ExtendedProfilePage::setCallback(std::function<void(ProfileData &)> callback) {

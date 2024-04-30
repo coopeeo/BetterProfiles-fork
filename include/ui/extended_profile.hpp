@@ -19,6 +19,7 @@ protected:
     // nodes
     CCMenuItemSpriteExtra* m_edit_button;
     CCLayerGradient* m_background;
+    MDTextArea* m_bio_area;
 public:
     static ExtendedProfilePage* create(ProfileData* const& profile_data, GJUserScore* const& user_score);
     void setCallback(std::function<void(ProfileData &)> callback);
