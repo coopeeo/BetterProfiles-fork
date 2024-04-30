@@ -4,6 +4,7 @@
 #include "ui/editpage.hpp"
 #include "ui/edit_pronouns.hpp"
 #include "ui/edit_bio.hpp"
+#include "ui/edit_background.hpp"
 #include <UIBuilder.hpp>
 
 using namespace geode::prelude;
@@ -109,6 +110,14 @@ void EditPage::setupLoggedIn() {
     Build<ButtonSprite>::create("Change Socials", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
         .intoMenuItem([](auto) {})
         .id("socials-button"_spr)
+        .parent(main_menu);
+
+    // background
+    Build<ButtonSprite>::create("Change Background", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
+        .intoMenuItem([](auto) {
+            EditBackgroundPopup::create(&(current_edit_page->m_profile_data))->show();
+        })
+        .id("background-button"_spr)
         .parent(main_menu);
 
     main_menu->updateLayout();
