@@ -67,7 +67,13 @@ bool EditBioPopup::setup(ProfileData* const& profile_data) {
 
 void EditBioPopup::onClose(cocos2d::CCObject* a) {
     // store text from popup when user closes the popup (to not discard what they wrote)
-    this->m_profile_data->bio = m_bio_text_node->getString();
+    auto str = m_bio_text_node->getString();
+    if (str.empty()) {
+        m_profile_data->bio = std::nullopt;
+    } else {
+        this->m_profile_data->bio = str;
+    }
+
     geode::Popup<ProfileData* const&>::onClose(a);
 }
 
