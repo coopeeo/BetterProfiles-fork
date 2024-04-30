@@ -1,7 +1,8 @@
 #include <Geode/Geode.hpp>
 
-#include "ui/extended_profile.hpp"
 #include <UIBuilder.hpp>
+#include "ui/extended_profile.hpp"
+#include "utils.hpp"
 
 using namespace geode::prelude;
 
@@ -21,8 +22,11 @@ bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* c
     auto win_size = CCDirector::sharedDirector()->getWinSize();
     auto game_manager = GameManager::sharedState();
 
-    auto col1 = game_manager->colorForIdx(user_score->m_color1);
-    auto col2 = game_manager->colorForIdx(user_score->m_color2);
+    auto player_col1 = game_manager->colorForIdx(user_score->m_color1);
+    auto player_col2 = game_manager->colorForIdx(user_score->m_color2);
+
+    auto col1 = profile_data->color1.has_value() ? Utils::intToColor(profile_data->color1.value_or(0)) : player_col1;
+    auto col2 = profile_data->color2.has_value() ? Utils::intToColor(profile_data->color2.value_or(0)) : player_col2;
 
     auto bg_sprite = getChildOfType<CCScale9Sprite>(this->m_mainLayer, 0);
 
@@ -63,8 +67,8 @@ bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* c
 
     auto spider = SimplePlayer::create(0);
     spider->updatePlayerFrame(user_score->m_playerSpider, IconType::Spider);
-    spider->setColor(col1);
-    spider->setSecondColor(col2);
+    spider->setColor(player_col1);
+    spider->setSecondColor(player_col2);
     if (user_score->m_glowEnabled) {
         spider->setGlowOutline(game_manager->colorForIdx(user_score->m_color3));
     }
