@@ -267,6 +267,6 @@ void EditPage::draw() {
     }
 }
 
-void EditPage::setCallback(std::function<void(ProfileData const&)> callback) {
+void EditPage::setCallback(std::function<void(ProfileData &)> callback) {
     this->m_callback = callback;
 }

@@ -9,12 +9,17 @@ class ExtendedProfilePage : public geode::Popup<ProfileData* const&, GJUserScore
 protected:
     bool setup(ProfileData* const& profile_data, GJUserScore* const& user_score) override;
 
+    void updateUI();
+
     // members
     ProfileData* m_profile_data;
     GJUserScore* m_user_score;
+    std::function<void(ProfileData &)> m_callback = nullptr;
+
+    // nodes
     CCMenuItemSpriteExtra* m_edit_button;
-    std::function<void(ProfileData const&)> m_callback = nullptr;
+    CCLayerGradient* m_background;
 public:
     static ExtendedProfilePage* create(ProfileData* const& profile_data, GJUserScore* const& user_score);
-    void setCallback(std::function<void(ProfileData const&)> callback);
+    void setCallback(std::function<void(ProfileData &)> callback);
 };

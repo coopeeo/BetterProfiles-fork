@@ -35,11 +35,11 @@ bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* c
         popup_content_size = bg_sprite->getContentSize();
         bg_sprite->setVisible(false);
 
-        auto gradient_layer = CCLayerGradient::create({col1.r, col1.g, col1.b, 255}, ccc4(col2.r, col2.g, col2.b, 255));
-        gradient_layer->setContentSize(popup_content_size - ccp(5.f, 5.f));
-        gradient_layer->ignoreAnchorPointForPosition(false);
-        gradient_layer->setPosition(win_size / 2);
-        this->m_mainLayer->addChild(gradient_layer, -1);
+        this->m_background = CCLayerGradient::create({col1.r, col1.g, col1.b, 255}, ccc4(col2.r, col2.g, col2.b, 255));
+        this->m_background->setContentSize(popup_content_size - ccp(5.f, 5.f));
+        this->m_background->ignoreAnchorPointForPosition(false);
+        this->m_background->setPosition(win_size / 2);
+        this->m_mainLayer->addChild(this->m_background, -1);
 
         auto popup_frame = CCScale9Sprite::create("GJ_square07.png");
         popup_frame->setContentSize(popup_content_size);
@@ -99,8 +99,22 @@ bool ExtendedProfilePage::setup(ProfileData* const& profile_data, GJUserScore* c
     return true;
 }
 
-void ExtendedProfilePage::setCallback(std::function<void(ProfileData const&)> callback) {
-    this->m_callback = callback;
+void ExtendedProfilePage::updateUI() {
+    auto player_col1 = GameManager::sharedState()->colorForIdx(this->m_user_score->m_color1);
+    auto player_col2 = GameManager::sharedState()->colorForIdx(this->m_user_score->m_color2);
+
+    auto col1 = this->m_profile_data->color1.has_value() ? Utils::intToColor(this->m_profile_data->color1.value_or(0)) : player_col1;
+    auto col2 = this->m_profile_data->color2.has_value() ? Utils::intToColor(this->m_profile_data->color2.value_or(0)) : player_col2;
+    this->m_background->setStartColor(col1);
+    this->m_background->setEndColor(col2);
+}
+
+void ExtendedProfilePage::setCallback(std::function<void(ProfileData &)> callback) {
+    this->m_callback = [this, callback](ProfileData &data) {
+        this->m_profile_data = &data;
+        this->updateUI();
+        callback(data);
+    };
     if (this->m_edit_button) {
         this->m_edit_button->setVisible(true);
     }

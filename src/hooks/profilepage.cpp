@@ -68,7 +68,7 @@ class $modify(BetterProfilePage, ProfilePage) {
                     log::info("profile button clicked");
                     auto epp = ExtendedProfilePage::create(&(m_fields->m_profile_data), m_score);
                     if (this->m_score->isCurrentUser()) {
-                        epp->setCallback([this](ProfileData const& profile_data) {
+                        epp->setCallback([this](ProfileData &profile_data) {
                             this->m_fields->m_profile_data = profile_data;
                             this->updateUIState();
                         });
