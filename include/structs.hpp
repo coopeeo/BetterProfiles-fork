@@ -1,5 +1,8 @@
 #pragma once
 
+#define TEXTURE_BUTTON_ENABLED "GJ_button_01.png"
+#define TEXTURE_BUTTON_DISABLED "GJ_button_04.png"
+
 struct ProfileData {
     int id;
     std::optional<std::string> bio; // md?

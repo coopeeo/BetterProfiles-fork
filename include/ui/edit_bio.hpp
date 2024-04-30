@@ -1,9 +1,6 @@
 #pragma once
 #include "structs.hpp"
 
-#define TEXTURE_BUTTON_ENABLED "GJ_button_01.png"
-#define TEXTURE_BUTTON_DISABLED "GJ_button_04.png"
-
 class EditBioPopup : public geode::Popup<ProfileData* const&>, TextInputDelegate {
 protected:
     bool setup(ProfileData* const& profile_data) override;
