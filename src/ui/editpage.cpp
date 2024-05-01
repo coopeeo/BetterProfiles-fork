@@ -148,7 +148,13 @@ void EditPage::onLogin() {
         m_login_sprite->updateBGImage("GJ_button_04.png");
         m_login_sprite->m_label->setColor(ccc3(175, 175, 175));
     }
-    // create loading circle
+
+    if (this->m_login_loading_circle != nullptr) {
+        m_login_loading_circle->fadeAndRemove();
+        m_login_loading_circle->removeFromParentAndCleanup(true);
+        m_login_loading_circle = nullptr;
+    }
+
     Build<LoadingCircle>::create()
         .pos(0.f, 0.f)
         .id("loading_circle"_spr)
@@ -178,7 +184,8 @@ void EditPage::onLogin() {
 
             if(current_edit_page->m_login_loading_circle) {
                 current_edit_page->m_login_loading_circle->fadeAndRemove();
-                current_edit_page->m_login_loading_circle->removeFromParent();
+                current_edit_page->m_login_loading_circle->removeFromParentAndCleanup(true);
+                current_edit_page->m_login_loading_circle->setVisible(false); // ugly hack, nobody will notice
                 current_edit_page->m_login_loading_circle = nullptr;
             }
         }
@@ -191,6 +198,12 @@ void EditPage::onLogin() {
 
         if (current_edit_page != nullptr) {
             current_edit_page->setupLoggedIn();
+            if(current_edit_page->m_login_loading_circle) {
+                current_edit_page->m_login_loading_circle->fadeAndRemove();
+                current_edit_page->m_login_loading_circle->removeFromParentAndCleanup(true);
+                current_edit_page->m_login_loading_circle->setVisible(false); // dumb hack, nobody will notice
+                current_edit_page->m_login_loading_circle = nullptr;
+            }
         }
     });
 }
