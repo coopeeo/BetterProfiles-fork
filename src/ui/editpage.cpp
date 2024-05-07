@@ -258,7 +258,9 @@ void EditPage::onSave() {
 
             if (!json_opt.has_value()) {
                 log::error("failed to parse json: {}\nServer returned {}", error_str, error);
-                error_str = "Server returned invalid response:\n<cr>" + error + "</c>\n" + "Server might be down, check your internet connection and try again later.";
+                std::string display_error = error;
+                if (error.length() > 100) display_error = "(error too long, check logs for details)";
+                error_str = "Server returned invalid response:\n<cr>" + display_error + "</c>\n" + "Server might be down, check your internet connection and try again later.";
             } else {
                 auto json = json_opt.value();
                 error_str = json.contains("message") ? json["message"].as_string() : "Server returned invalid JSON response";
