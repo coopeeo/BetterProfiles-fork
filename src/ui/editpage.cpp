@@ -251,9 +251,19 @@ void EditPage::onSave() {
             current_edit_page->removeFromParent();
         }).expect([](std::string const& error) {
             log::info("failed to save profile data: {}", error);
-            auto json = matjson::parse(error);
 
-            FLAlertLayer::create("Failed to save profile", fmt::format("{}", json.contains("message") ? json["message"].as_string() : "wtf"), "OK")->show();
+            std::string error_str = "";
+            auto json_opt = matjson::parse(error, error_str);
+
+            if (!json_opt.has_value()) {
+                log::error("failed to parse json: {}\nServer returned {}", error_str, error);
+                error_str = "Server returned invalid response:\n<cr>" + error + "</c>\n" + "Server might be down, check your internet connection and try again later.";
+            } else {
+                auto json = json_opt.value();
+                error_str = json.contains("message") ? json["message"].as_string() : "Server returned invalid JSON response";
+            }
+
+            FLAlertLayer::create("Failed to save profile", error_str, "OK")->show();
             if (current_edit_page == nullptr) return;
             current_edit_page->m_save_loading_circle->fadeAndRemove();
             current_edit_page->m_save_loading_circle->removeFromParentAndCleanup(true);
