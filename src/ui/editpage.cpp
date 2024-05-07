@@ -245,6 +245,7 @@ void EditPage::onSave() {
             if (current_edit_page == nullptr) return;
             if(current_edit_page->m_callback != nullptr) current_edit_page->m_callback(current_edit_page->m_profile_data);
             current_edit_page->m_original_data = current_edit_page->m_profile_data;
+            current_edit_page->m_save_loading_circle->setVisible(false);
             current_edit_page->m_save_loading_circle->fadeAndRemove();
             current_edit_page->m_save_loading_circle->removeFromParentAndCleanup(true);
             current_edit_page->m_save_loading_circle = nullptr;
@@ -265,6 +266,7 @@ void EditPage::onSave() {
 
             FLAlertLayer::create("Failed to save profile", error_str, "OK")->show();
             if (current_edit_page == nullptr) return;
+            current_edit_page->m_save_loading_circle->setVisible(false); // i hate loading circles
             current_edit_page->m_save_loading_circle->fadeAndRemove();
             current_edit_page->m_save_loading_circle->removeFromParentAndCleanup(true);
             current_edit_page->m_save_loading_circle = nullptr;
