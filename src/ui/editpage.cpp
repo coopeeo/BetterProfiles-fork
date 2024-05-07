@@ -132,6 +132,16 @@ void EditPage::setupLoggedIn() {
         .visible(false)
         .parent(m_buttonMenu)
         .store(m_save_button);
+    
+    // logout button
+    Build<ButtonSprite>::create("Logout", 64, true, "bigFont.fnt", "GJ_button_06.png", 32.0f, 1.0f)
+        .intoMenuItem([this](auto) {
+            Mod::get()->setSavedValue<std::string>("token", "");
+            this->removeFromParent();
+        })
+        .pos(180.f, 118.f)
+        .id("logout-button"_spr)
+        .parent(m_buttonMenu);
 }
 
 void EditPage::onLogin() {
