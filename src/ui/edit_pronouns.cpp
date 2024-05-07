@@ -25,17 +25,23 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
 
     this->setTitle("Change Pronouns");
 
-    Build<CCLabelBMFont>::create("meow", "bigFont.fnt")
-        .id("pronouns-label"_spr)
-        .pos(win_size.width / 2, 60.f)
-        .scale(0.75f)
+    Build<TextInput>::create(128.f, "they/them", "bigFont.fnt")
+        .id("pronouns-input"_spr)
+        .pos(win_size.width / 2, 70.f)
         .parent(m_mainLayer)
-        .store(m_pronouns_label);
+        .store(m_pronouns_input);
+    m_pronouns_input->setFilter("abcdefghijklmnopqrstuvwxyz/");
+
+    m_pronouns_input->setString(this->m_profile_data->pronouns.value_or("").c_str());
+    m_pronouns_input->setCallback([this](const std::string& text) {
+        this->m_profile_data->pronouns = text;
+        this->updateUI();
+    });
 
     Build<CCMenu>::create()
         .id("pronoun-sets-menu"_spr)
         .layout(RowLayout::create()->setGap(18.f))
-        .pos(win_size / 2)
+        .pos(win_size.width / 2, win_size.height / 2 + 16.f)
         .parent(m_mainLayer)
         .child(this->createPronounSet(1))
         .child(this->createPronounSet(2))
@@ -46,12 +52,12 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
     this->parsePronouns(profile_data->pronouns.value_or(""));
     this->updateUI();
 
-    Build<CCLabelBMFont>::create("if you want custom pronouns, send a GD message to rooot", "goldFont.fnt")
+    Build<CCLabelBMFont>::create("Note: This is an accessibility feature - please use it responsively.", "goldFont.fnt")
         .id("custom-notice"_spr)
         .scale(0.5f)
         .pos(win_size.width / 2, 45.f)
         .parent(m_mainLayer)
-        .intoNewSibling(CCLabelBMFont::create("(this is to prevent abuse)", "goldFont.fnt"))
+        .intoNewSibling(CCLabelBMFont::create("(abuse will result in a ban)", "goldFont.fnt"))
             .scale(0.5f)
             .pos(win_size.width / 2, 35.f);
 
@@ -159,7 +165,7 @@ void EditPronounsPopup::updateUI() {
     }
 
     // update pronouns label
-    this->m_pronouns_label->setString(this->m_profile_data->pronouns.value_or("").c_str());
+    this->m_pronouns_input->setString(this->m_profile_data->pronouns.value_or("").c_str());
 }
 
 CCMenu* EditPronounsPopup::createPronounSet(int set) {

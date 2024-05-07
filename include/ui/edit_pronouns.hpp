@@ -1,5 +1,6 @@
 #pragma once
 #include "structs.hpp"
+#include <Geode/ui/TextInput.hpp>
 
 class EditPronounsPopup : public geode::Popup<ProfileData* const&> {
 protected:
@@ -13,7 +14,7 @@ protected:
     void onPronounButtonClicked(int set, std::string pronoun);
 
     ProfileData* m_profile_data;
-    cocos2d::CCLabelBMFont* m_pronouns_label = nullptr;
+    geode::TextInput* m_pronouns_input = nullptr;
     cocos2d::CCMenu* m_pronoun_sets_menu = nullptr;
 public:
     static EditPronounsPopup* create(ProfileData* const& profile_data);
