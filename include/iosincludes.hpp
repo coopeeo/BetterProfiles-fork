@@ -1,5 +1,5 @@
 #pragma once
-#if CMAKE_SYSTEM_NAME == "iOS"
+#ifdef GEODE_IS_IOS
 #pragma message("iOS Includes: The current platform is iOS, so there will be std included and other files so iOS works.")
 #include <string>
 #include <optional>
