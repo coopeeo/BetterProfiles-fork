@@ -1,5 +1,5 @@
 #pragma once
-#if defined(GEODE_TARGET_PLATFORM) && (GEODE_TARGET_PLATFORM == PLATFORM_IOS || defined(IOS))
+#if defined(GEODE_TARGET_PLATFORM) && (GEODE_TARGET_PLATFORM == "iOS" || defined(IOS))
 #pragma message("iOS Includes: The current platform is iOS, so there will be std included and other files so iOS works.")
 #include <string>
 #include <optional>
