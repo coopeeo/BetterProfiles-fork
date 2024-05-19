@@ -1,6 +1,6 @@
 #pragma once
 #ifdef GEODE_IS_IOS
-#pragma message("iOS Includes: The current platform is iOS, so there will be std included and other files so iOS works.")
+#pragma message(STATUS "iOS Includes: The current platform is iOS, so there will be std included and other files so iOS works.")
 #include <string>
 #include <optional>
 #include <vector>
