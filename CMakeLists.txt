@@ -6,7 +6,7 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 project(BetterProfiles VERSION 1.0.0)
 
-if(${GEODE_TARGET_PLATFORM} STREQUAL "iOS")
+if(${GEODE_TARGET_PLATFORM} STREQUAL "iOS" OR IOS)
   message(STATUS "building for ios :3")
   unset(CMAKE_OSX_ARCHITECTURES)
   set(CMAKE_OSX_ARCHITECTURES arm64)
@@ -30,7 +30,7 @@ endif()
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 CPMAddPackage("gh:RoootTheFox/uibuilder#main")
-CPMAddPackage("gh:RoootTheFox/dashauth#main")
+CPMAddPackage("gh:coopeeo/dashauth#main")
 target_link_libraries(${PROJECT_NAME} UIBuilder DashAuth)
 
 setup_geode_mod(${PROJECT_NAME} EXTERNALS rooot.dashauth)
