@@ -1,5 +1,5 @@
 #pragma once
-#if (GEODE_TARGET_PLATFORM == "iOS")
+#if GEODE_TARGET_PLATFORM == iOS
 #pragma message("iOS Includes: The current platform is iOS, so there will be std included and other files so iOS works.")
 #include <string>
 #include <optional>
