@@ -7,6 +7,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/cocos/include/ccTypes.h>
 #else
-#pragma message("iOS Includes: not iOS, so nothing will be included")
+#pragma message(STATUS "iOS Includes: not iOS, so nothing will be included")
 #endif
 // ? This is here for importing classes on iOS because iOS doesn't like when string isn't imported!
