@@ -136,6 +136,7 @@ void EditPage::setupLoggedIn() {
     // logout button
     Build<ButtonSprite>::create("Logout", 64, true, "bigFont.fnt", "GJ_button_06.png", 32.0f, 1.0f)
         .intoMenuItem([this](auto) {
+            Mod::get()->setSavedValue<std::string>("dashauth_token_rooot.betterprofiles", "");
             Mod::get()->setSavedValue<std::string>("token", "");
             this->removeFromParent();
         })
