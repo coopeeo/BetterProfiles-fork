@@ -46,7 +46,7 @@ class $modify(BetterProfilePage, ProfilePage) {
             return;
         }
 
-        auto pos = this->m_usernameLabel->getPosition();
+        auto pos = this->m_usernameLabel->getParent()->getPosition();
 
         if (!this->m_fields->m_pronoun_label) {
             log::debug("creating pronoun label");
