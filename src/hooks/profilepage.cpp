@@ -16,6 +16,8 @@ class $modify(BetterProfilePage, ProfilePage) {
         CCSize m_profile_button_content_size;
         ProfileData m_profile_data;
         bool m_data_loaded = false;
+
+        EventListener<web::WebTask> m_web_listener;
     };
 
     static inline BetterProfilePage* current_profile_page = nullptr;
@@ -120,11 +122,23 @@ class $modify(BetterProfilePage, ProfilePage) {
             return;
         }
 
-        web::AsyncWebRequest()
-            .fetch(fmt::format("{}/api/v1/profiles/{}", BACKEND_PREFIX, account_id))
-            .json()
-            .then([account_id](matjson::Value const& response) {
-                if (!response["success"].as_bool()) {
+        this->m_fields->m_web_listener.bind([this, account_id] (web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                auto response = res->json();
+                if (response == nullptr || response.isErr()) {
+                    auto error = response.isErr() ? response.error() : "unknown error";
+                    log::error("failed to fetch profile data: {}", error);
+                    if (current_profile_page != nullptr) {
+                        current_profile_page->m_fields->m_profile_data = ProfileData();
+                        current_profile_page->m_fields->m_profile_data.id = account_id;
+                        current_profile_page->m_fields->m_data_loaded = false;
+                        current_profile_page->updateUIState();
+                    }
+                    return;
+                }
+                auto json = response.unwrap();
+
+                if (!json["success"].as_bool()) {
                     log::error("failed to fetch profile data");
                     return;
                 }
@@ -138,22 +152,22 @@ class $modify(BetterProfilePage, ProfilePage) {
                 log::info("fetched profile data");
 
                 // parse data and update UI
-                auto profile_data = response["data"].as<ProfileData>();
+                auto profile_data = json["data"].as<ProfileData>();
                 current_profile_page->m_fields->m_profile_data = profile_data;
                 current_profile_page->m_fields->m_profile_data.id = account_id;
                 current_profile_page->m_fields->m_data_loaded = true;
 
                 State::sharedInstance()->profiles[account_id] = profile_data;
                 current_profile_page->updateUIState();
-        }).expect([account_id](std::string const& error) {
-            log::error("failed to fetch profile data: {}", error);
-            if (current_profile_page != nullptr) {
-                current_profile_page->m_fields->m_profile_data = ProfileData();
-                current_profile_page->m_fields->m_profile_data.id = account_id;
-                current_profile_page->m_fields->m_data_loaded = false;
-                current_profile_page->updateUIState();
+            } else if (web::WebProgress* p = e->getProgress()) {
+                // meow :3
+            } else if (e->isCancelled()) {
+                log::info("The request was cancelled... So sad :(");
             }
         });
+
+        auto req = web::WebRequest();
+        this->m_fields->m_web_listener.setFilter(req.get(fmt::format("{}/api/v1/profiles/{}", BACKEND_PREFIX, account_id)));
     }
 
     // updates UI based on m_profile_data

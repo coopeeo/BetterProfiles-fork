@@ -244,13 +244,36 @@ void EditPage::onSave() {
 
     m_save_loading_circle->show();
 
-    // save the profile data
-    geode::utils::web::AsyncWebRequest()
-        .body(this->m_profile_data)
-        .header(fmt::format("Authorization: Bearer {}", Mod::get()->getSavedValue<std::string>("token", "")))
-        .post(fmt::format("{}/api/v1/profiles/{}", BACKEND_PREFIX, this->m_profile_data.id))
-        .json()
-        .then([](matjson::Value const& response) {
+    m_web_listener.bind([this] (web::WebTask::Event* e) {
+        if (web::WebResponse* res = e->getValue()) {
+            auto response = res->json();
+            if (response == nullptr || response.isErr()) {
+                auto error = response.isErr() ? response.error() : "unknown error";
+                log::info("failed to save profile data: {}", error);
+
+                std::string error_str = "";
+                auto json_opt = matjson::parse(error, error_str);
+
+                if (!json_opt.has_value()) {
+                    log::error("failed to parse json: {}\nServer returned {}", error_str, error);
+                    std::string display_error = error;
+                    if (error.length() > 100) display_error = "(error too long, check logs for details)";
+                    error_str = "Server returned invalid response:\n<cr>" + display_error + "</c>\n" + "Server might be down, check your internet connection and try again later.";
+                } else {
+                    auto json = json_opt.value();
+                    error_str = json.contains("message") ? json["message"].as_string() : "Server returned invalid JSON response";
+                }
+
+                FLAlertLayer::create("Failed to save profile", error_str, "OK")->show();
+                if (current_edit_page == nullptr) return;
+                current_edit_page->m_save_loading_circle->setVisible(false); // i hate loading circles
+                current_edit_page->m_save_loading_circle->fadeAndRemove();
+                current_edit_page->m_save_loading_circle->removeFromParentAndCleanup(true);
+                current_edit_page->m_save_loading_circle = nullptr;
+                return;
+            }
+
+            auto json = response.unwrap();
             log::info("saved profile data !!");
 
             if (current_edit_page == nullptr) return;
@@ -261,29 +284,17 @@ void EditPage::onSave() {
             current_edit_page->m_save_loading_circle->removeFromParentAndCleanup(true);
             current_edit_page->m_save_loading_circle = nullptr;
             current_edit_page->removeFromParent();
-        }).expect([](std::string const& error) {
-            log::info("failed to save profile data: {}", error);
+        } else if (web::WebProgress* p = e->getProgress()) {
+            // meow :3
+        } else if (e->isCancelled()) {
+            log::info("The request was cancelled... So sad :(");
+        }
+    });
 
-            std::string error_str = "";
-            auto json_opt = matjson::parse(error, error_str);
-
-            if (!json_opt.has_value()) {
-                log::error("failed to parse json: {}\nServer returned {}", error_str, error);
-                std::string display_error = error;
-                if (error.length() > 100) display_error = "(error too long, check logs for details)";
-                error_str = "Server returned invalid response:\n<cr>" + display_error + "</c>\n" + "Server might be down, check your internet connection and try again later.";
-            } else {
-                auto json = json_opt.value();
-                error_str = json.contains("message") ? json["message"].as_string() : "Server returned invalid JSON response";
-            }
-
-            FLAlertLayer::create("Failed to save profile", error_str, "OK")->show();
-            if (current_edit_page == nullptr) return;
-            current_edit_page->m_save_loading_circle->setVisible(false); // i hate loading circles
-            current_edit_page->m_save_loading_circle->fadeAndRemove();
-            current_edit_page->m_save_loading_circle->removeFromParentAndCleanup(true);
-            current_edit_page->m_save_loading_circle = nullptr;
-        });
+    auto req = web::WebRequest();
+    req.bodyJSON(this->m_profile_data);
+    req.header("Authorization", fmt::format("Bearer {}", Mod::get()->getSavedValue<std::string>("token", "")));
+    m_web_listener.setFilter(req.post(fmt::format("{}/api/v1/profiles/{}", BACKEND_PREFIX, this->m_profile_data.id)));
 }
 
 void EditPage::keyDown(cocos2d::enumKeyCodes key) {

@@ -25,6 +25,7 @@ protected:
     ProfileData m_profile_data;
     ProfileData m_original_data;
     std::function<void(ProfileData &)> m_callback = nullptr;
+    EventListener<web::WebTask> m_web_listener;
 
     // members - nodes
     CCLabelBMFont* m_login_prompt_1 = nullptr;
