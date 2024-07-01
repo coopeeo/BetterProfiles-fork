@@ -23,5 +23,12 @@
 			"importance": "breaking",
 			"version": "<1.0.8"
 		}
-	]
+	],
+	"resources": {
+		"spritesheets": {
+			"replacements": [
+				"resources/sprites/pencil.png"
+			]
+		}
+	}
 }

@@ -85,7 +85,7 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
         .parent(this->m_mainLayer)
         .collect();
 
-    Build<geode::CircleButtonSprite>::create(CCSprite::createWithSpriteFrameName("geode.loader/pencil.png"), CircleBaseColor::Green, CircleBaseSize::MediumAlt)
+    Build<geode::CircleButtonSprite>::create(CCSprite::createWithSpriteFrameName("pencil.png"_spr), CircleBaseColor::Green, CircleBaseSize::MediumAlt)
         .scale(0.65f)
         .intoMenuItem([this](auto) {
             log::info("edit button clicked");
