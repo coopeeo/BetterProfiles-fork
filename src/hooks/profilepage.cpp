@@ -10,11 +10,13 @@
 using namespace geode::prelude;
 
 class $modify(BetterProfilePage, ProfilePage) {
-    CCLabelBMFont* m_pronoun_label = nullptr;
-    CCMenuItemSpriteExtra* m_profile_button;
-    CCSize m_profile_button_content_size;
-    ProfileData m_profile_data;
-    bool m_data_loaded = false;
+    struct Fields {
+        CCLabelBMFont* m_pronoun_label = nullptr;
+        CCMenuItemSpriteExtra* m_profile_button;
+        CCSize m_profile_button_content_size;
+        ProfileData m_profile_data;
+        bool m_data_loaded = false;
+    };
 
     static inline BetterProfilePage* current_profile_page = nullptr;
 
